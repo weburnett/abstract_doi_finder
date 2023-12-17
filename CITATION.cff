@@ -1,12 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: "Sleeper"
-  given-names: "Noah"
+- family-names: "Reynolds"
+  given-names: "Adam"
 - family-names: "Aubert"
   given-names: "Clément"
   orcid: "https://orcid.org/0000-0001-6346-3043"
-title: "Data Integration for the Study of Outstanding Productivity in Biomedical Research"
+title: "Abstract & Doi Finder"
 version: 1.0.0
-date-released: 2022-04-18
-url: "https://github.com/popbr/data-integration"
+date-released: 2023-12-17
+url: "https://github.com/popbr/abstract_doi_finder/"
