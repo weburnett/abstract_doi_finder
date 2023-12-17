@@ -14,4 +14,4 @@ mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder"
 
 - [Maven](https://maven.apache.org/install.html) (tested with Maven 3.9.6),
 - Java (tested with Java 17.0.9),
-
+- Place the `Publication_Abstracts_Only_Dataset_9-26-23_.xlsx` spreadsheet in `abstract_doi_finder/input/`,

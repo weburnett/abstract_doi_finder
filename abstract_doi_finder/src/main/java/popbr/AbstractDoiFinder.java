@@ -234,7 +234,7 @@ public class AbstractDoiFinder {
     public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList) throws Exception {
         try {
             String BasePath = EstablishFilePath();
-            String AbstractFile = BasePath + File.separator + "target" + File.separator + "downloads" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
+            String AbstractFile = BasePath + File.separator + "input" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
 
            ArrayList<String> abstractList = writeList.get(0);
            ArrayList<String> doiList = writeList.get(1); 
@@ -292,9 +292,10 @@ public class AbstractDoiFinder {
               }
            }
 
-           String AbstractFile2 = BasePath + File.separator + "target" + File.separator + "downloads" + File.separator + "Abstacts2.xlsx";
+           new File(BasePath + File.separator + "output").mkdirs();
+           String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
 
-           FileOutputStream out = new FileOutputStream(new File(AbstractFile2));
+           FileOutputStream out = new FileOutputStream(new File(AbstractFileCompleted));
            wb.write(out);
            out.close();
            fins.close();
