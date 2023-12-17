@@ -173,7 +173,7 @@ public class AbstractDoiFinder {
        ArrayList<String> searchList = new ArrayList<String>();
        
        String BasePath = EstablishFilePath();
-       String SourceFile = BasePath + File.separator + "target" + File.separator + "downloads" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
+       String SourceFile = BasePath + File.separator + "input" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
        
        FileInputStream fins = new FileInputStream(new File(SourceFile));
 
