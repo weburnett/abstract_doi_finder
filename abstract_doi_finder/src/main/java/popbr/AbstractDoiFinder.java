@@ -3,6 +3,12 @@ package popbr;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+
+import java.util.ArrayList;
+
+import java.net.UnknownHostException;
+import java.net.MalformedURLException;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -10,14 +16,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 
-import java.util.ArrayList;
-
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.net.MalformedURLException;
-
-// Documentation at 
-// https://jsoup.org/apidocs/org/jsoup/nodes/Document.html
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,13 +25,16 @@ public class AbstractDoiFinder {
     public static void main(String[] args) throws Exception { 
        
        System.out.println("Welcome to Abstract/DOI Finder.");
+       
+       for (int sheetIndex = 2; sheetIndex < 57; sheetIndex++){ // We are hard-coding the sheets that we are exploring.
 
-       ArrayList<String> searchList = Read_From_Excel(); // will return a searchList that has the author's name and all of the titles for our search query
+         ArrayList<String> searchList = Read_From_Excel(sheetIndex); // Returns a searchList that has the author's name and all of the titles for our search query
     
-       ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); //takes a few minutes to accomplish due to having to search on the Internet
+         ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
 
-       Write_To_Excel(contentList); // Currently only does one sheet at a time and needs to be manually updated
-
+         Write_To_Excel(contentList, sheetIndex); // Currently only does one sheet at a time and needs to be manually update
+       }
+       
        System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
        
        System.exit(0);
@@ -168,7 +169,7 @@ public class AbstractDoiFinder {
     
     }
 
-    public static ArrayList<String> Read_From_Excel() throws IOException, Exception{
+    public static ArrayList<String> Read_From_Excel(int sheetIndex) throws IOException, Exception{
        
        ArrayList<String> searchList = new ArrayList<String>();
        
@@ -183,9 +184,11 @@ public class AbstractDoiFinder {
         Currently manually inputting the sheet index
         Starting at 2 which would be:
         "Bothwell, A Pub Abstracts"
+        
+        UPDATED: now, parameter sheetIndex gives sheet to be extracted.
        */
 
-       XSSFSheet sheet = wb.getSheetAt(2);
+       XSSFSheet sheet = wb.getSheetAt(sheetIndex);
 
        int rows = sheet.getLastRowNum(); // gets number of rows
        int cols = sheet.getRow(0).getLastCellNum(); // gets the number of columns
@@ -231,7 +234,7 @@ public class AbstractDoiFinder {
 
     // old params: ArrayList<String> writingList, ArrayList<String> doiList
     // new param because of new modified method: ArrayList<ArrayList<String>>
-    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList) throws Exception {
+    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex) throws Exception {
         try {
             String BasePath = EstablishFilePath();
             String AbstractFile = BasePath + File.separator + "input" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
@@ -246,7 +249,9 @@ public class AbstractDoiFinder {
            // Currently manually inputting the sheet index
            // Starting at 2 which would be:
            // "Bothwell, A Pub Abstracts"
-           XSSFSheet sheet = wb.getSheetAt(2);
+           
+           // UPDATED: now look at sheetIndex sheet.
+           XSSFSheet sheet = wb.getSheetAt(sheetIndex);
 
            //int rows = sheet.getLastRowNum(); //gets the number of rows in the sheet
 
@@ -293,7 +298,7 @@ public class AbstractDoiFinder {
            }
 
            new File(BasePath + File.separator + "output").mkdirs();
-           String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
+           String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
 
            FileOutputStream out = new FileOutputStream(new File(AbstractFileCompleted));
            wb.write(out);
