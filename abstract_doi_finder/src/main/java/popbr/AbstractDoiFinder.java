@@ -1,5 +1,4 @@
 package popbr;
-// mvn exec:java -Dexec.mainClass="popbr.AbstractFinder"
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +23,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class AbstractFinder {
+public class AbstractDoiFinder {
     public static void main(String[] args) throws Exception { 
        
        System.out.println("Welcome to Abstract/DOI Finder.");
