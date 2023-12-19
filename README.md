@@ -7,8 +7,10 @@ _A guide on how to use this tool will follow._
 ```
 cd abstract_doi_finder/
 mvn compile
-mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder"
+mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder" -Dexec.args="Publication_Abstracts_Only_Dataset_9-26-23.xlsx"
 ```
+
+where `Publication_Abstracts_Only_Dataset_9-26-23.xlsx` is the name of the spreadsheet placed in the `abstract_doi_finder/input/` folder.
 
 # Pre-requisites
 

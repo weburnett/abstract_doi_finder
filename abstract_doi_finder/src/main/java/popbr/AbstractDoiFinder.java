@@ -1,6 +1,7 @@
 package popbr;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,31 +17,124 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 
+import org.apache.commons.io.FileUtils;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class AbstractDoiFinder {
-    public static void main(String[] args) throws Exception { 
+   public static void main(String[] args) throws Exception {
+      /*
+       * Welcome message and looking for spreadsheet to process.
+       */
+      System.out.println("Welcome to Abstract/DOI Finder.");
+      try{
+         File inputFile = FindInputFile(args);
+         File outputFile = CreateOutput(inputFile);
+         
+         // This part needs additional work.
+         /*
+          * 
+          * for (int sheetIndex = 2; sheetIndex < 57; sheetIndex++){ // We are hard-coding the sheets that we are exploring.
+          * 
+          *  ArrayList<String> searchList = Read_From_Excel(sheetIndex); // Returns a searchList that has the author's name and all of the titles for our search query
+          * 
+          *  ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
+          * 
+          *  Write_To_Excel(contentList, sheetIndex); // Currently only does one sheet at a time and needs to be manually update
+      }
+      */
+         
+         System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
+         
+         
+      } catch(IOException e) {
+         System.out.println(e.getMessage());
+         System.exit(0);
+      }
+   }
+   
+   /* 
+    * This method tries to establish if a spreadsheet 
+    * can be found. It will throw an exception if 
+    * - The input/ folder does not exist,
+    * - The file specified by the user does not exist, 
+    * - The file specified by the user is not a spreadheet,
+    * - Or, if the user did not specify an input file, 
+    *   if the input/ folder does not contain only one single spreasheet,
+    * Otherwise, the spreadsheet is returned as a file.
+    */
+   
+    public static File FindInputFile(String[] args) throws Exception {
+       // We first make sure that the input/ folder exists.
+       String BasePath = EstablishFilePath(); // Current folder.
+       File inputFolder = new File(BasePath + File.separator + "input"); // Input folder.
+       File inputFile; // This variable will hold the file to process.
        
-       System.out.println("Welcome to Abstract/DOI Finder.");
+       // Create a FileFilter, cf. https://www.geeksforgeeks.org/file-listfiles-method-in-java-with-examples/
+       // This will let us filter files that ends with xlsx
+       FileFilter xlsxFilter = new FileFilter() { 
+          public boolean accept(File f) 
+          { 
+             return f.getName().endsWith("xlsx"); 
+          } 
+       }; 
        
-       for (int sheetIndex = 2; sheetIndex < 57; sheetIndex++){ // We are hard-coding the sheets that we are exploring.
-
-         ArrayList<String> searchList = Read_From_Excel(sheetIndex); // Returns a searchList that has the author's name and all of the titles for our search query
-    
-         ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
-
-         Write_To_Excel(contentList, sheetIndex); // Currently only does one sheet at a time and needs to be manually update
+       if (!inputFolder.exists() || !inputFolder.isDirectory()) { // If input/ does not exists, or if it is not a folder.
+          throw new IOException("Sorry, there is no input/ folder, there is nothing I can do.\nPlease, create an input/ folder and place your spreadsheet in it.");
        }
-       
-       System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
-       
-       System.exit(0);
+       else{ // The input/ folder exists
+          if (args.length == 0) { // Did the user gave an argument?
+             System.out.println("You did not provide a file to process, I will look in the input/ folder for a spreadsheet.");
+             File[] filesInInputFolder = inputFolder.listFiles(xlsxFilter); // We filter the list of files in input/, looking for files that ends with xlsx.
+             if (filesInInputFolder.length > 1){
+                String exceptionToReturn = "There seems to be multiple xlsx files in the input/ folder:\n";
+                // List the names of the files 
+                for (int i = 0; i < filesInInputFolder.length; i++) { 
+                   exceptionToReturn += "\t- " + filesInInputFolder[i] + "\n"; 
+                }
+                exceptionToReturn += "Please, place only one xlsx file in the input/ folder.";
+                throw new IOException(exceptionToReturn);
+             }
+             else if (filesInInputFolder.length == 0){
+                throw new IOException("There seems to no xlsx files in the input/ folder. Please, provide one xlsx file.");
+             }
+             else{ // there is exactly one spreadsheet in the input/ folder
+                System.out.println("I found exactly one spreadsheet in the input folder:\n\t" + filesInInputFolder[0] + "\nAnd will process that file.");
+                inputFile = filesInInputFolder[0];
+             }
+          }
+          else{ // The user provided an argument.
+             inputFile = new File(BasePath + File.separator + "input" + File.separator + args[0]);
+             if (!inputFile.exists()){
+                throw new IOException("You requested that I process the file\n\t" + inputFile + "\nBut this file does not seem to exist.");
+             }
+             else if (!inputFile.getName().endsWith("xlsx")) { // If the argument does not match a file, or if 
+                throw new IOException("You requested that I process the file\n\t" + inputFile + "\nBut this file does not seem to be a spreadsheet.");
+             }
+             else { // The file exists, and it ends with xlsx
+                System.out.println("Ok, I will now process:\n\t" + inputFile + "\n");
+             }
+          }
+       }
+       return inputFile;
     }
     
-    // make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
+    public static File CreateOutput(File inputFile) throws Exception{
+       String BasePath = EstablishFilePath(); // Current folder.
+       // We first create the output/ folder
+       new File(BasePath + File.separator + "output").mkdirs();
+       File outputFile = new File(BasePath + File.separator + "output" + File.separator + inputFile.getName());
+       if (outputFile.exists()){
+          throw new IOException("It seems that the file\n\t" + outputFile + "\nalready exists. Please rename it so that it doesn't get overridden.");
+      }
+       FileUtils.copyFile(inputFile, outputFile, false); // Cf. https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html#copyFile(java.io.File,java.io.File,boolean)
+       return outputFile;
+   }
+
+// make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
     // need to figure out how to differentiate between what threw an error (we now are doing two things that can throw a NullPointerException 
     // and we don't want the error to crash the program because of the amount of entries we have --> right now, I'm just making it set the text for both to not having
     // one, even if it does have one, but not the other
@@ -297,6 +391,7 @@ public class AbstractDoiFinder {
               }
            }
 
+           // TO REMOVE
            new File(BasePath + File.separator + "output").mkdirs();
            String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
 
