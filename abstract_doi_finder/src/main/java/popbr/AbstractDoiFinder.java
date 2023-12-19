@@ -39,6 +39,20 @@ public class AbstractDoiFinder {
          }
          else{ // If the file returned is not empty.
             FileOutputStream outputFile = CreateOutput(inputPath);
+            
+            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
+         for (int sheetIndex=startingSheet; sheetIndex< 3
+              //wb.getNumberOfSheets()
+              ; sheetIndex++){ // TODO : try small first ;-) 
+           ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
+           ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
+           Write_To_Excel(contentList, sheetIndex, outputFile); // Currently only does one sheet at a time and needs to be manually update
+      }
+      //TODO Error message "Cleaning up unclosed ZipFile for archive /donnees/travail/git/abstract_doi_finder/abstract_doi_finder/input/Publication_Abstracts_Only_Dataset_9-26-23.xlsx"
+      // Something is amiss. The sheet has0sheets, but I am looking for sheet #2
+      
+         
+         System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          }
          // This part needs additional work.
 //         XSSFWorkbook wb = new XSSFWorkbook(outputFile);
@@ -78,16 +92,7 @@ public class AbstractDoiFinder {
                */
          
          /*
-         int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
-         for (int sheetIndex=startingSheet; sheetIndex< 3
-              //wb.getNumberOfSheets()
-              ; sheetIndex++){ // TODO : try small first ;-) 
-           ArrayList<String> searchList = Read_From_Excel(sheetIndex, outputFile); // Returns a searchList that has the author's name and all of the titles for our search query
-           ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
-           Write_To_Excel(contentList, sheetIndex, outputFile); // Currently only does one sheet at a time and needs to be manually update
-      }
          
-         System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          */
          
          
@@ -198,7 +203,7 @@ public class AbstractDoiFinder {
          noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();  // This is bad practise: I am assuming that each row has the same number of columns as the first one.
          sheet.shiftColumns(newColumn, noOfColumns, 1);
          sheet.getRow(0).createCell(newColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers.
-         sheet.getRow(1).createCell(newColumn, CellType.STRING).setCellValue("Test");
+//         sheet.getRow(1).createCell(newColumn, CellType.STRING).setCellValue("Test"); // Ok, works.
       }
       wb.write(outputFile);
       return outputFile;
@@ -331,17 +336,19 @@ public class AbstractDoiFinder {
     returnedList.add(doiList);
 
     return returnedList;
-    
     }
 
-    public static ArrayList<String> Read_From_Excel(int sheetIndex, File outputFile) throws IOException, Exception{
+    public static ArrayList<String> Read_From_Excel(int sheetIndex, File inputPath) throws IOException, Exception{
        
        ArrayList<String> searchList = new ArrayList<String>();
       
-       FileInputStream fins = new FileInputStream(outputFile);
+       FileInputStream fins = new FileInputStream(inputPath);
 
        XSSFWorkbook wb = new XSSFWorkbook(fins); // creates a workbook that we can search, which allows us to get the author's name and the titles of each publication
        // TODO: I believe the fins file is not required.
+       if (wb.getNumberOfSheets() < sheetIndex){
+          System.out.println("Inside Read_From_Excel, something is amiss. The sheet has" + wb.getNumberOfSheets() + "sheets, but I am looking for sheet #" + sheetIndex);
+      }
        
        /*
         Currently manually inputting the sheet index
@@ -397,14 +404,16 @@ public class AbstractDoiFinder {
 
     // old params: ArrayList<String> writingList, ArrayList<String> doiList
     // new param because of new modified method: ArrayList<ArrayList<String>>
-    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex, File outputFile) throws Exception {
+    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex, FileOutputStream outputFile) throws Exception {
         try {
            ArrayList<String> abstractList = writeList.get(0);
            ArrayList<String> doiList = writeList.get(1); 
 
-           FileInputStream fins = new FileInputStream(outputFile); 
-
-           XSSFWorkbook wb = new XSSFWorkbook(fins);
+           XSSFWorkbook wb = new XSSFWorkbook();
+           if (wb.getNumberOfSheets() < sheetIndex){
+              System.out.println("Indiside Write_To_Excel, something is amiss. The sheet has" + wb.getNumberOfSheets() + "sheets, but I am looking for sheet #" + sheetIndex);
+           }
+           
 
            // Currently manually inputting the sheet index
            // Starting at 2 which would be:
@@ -458,15 +467,12 @@ public class AbstractDoiFinder {
            }
 
            // TO REMOVE
-           String BasePath = EstablishFilePath(); // Current folder.
-           new File(BasePath + File.separator + "output").mkdirs();
+//           String BasePath = EstablishFilePath(); // Current folder.
+//           new File(BasePath + File.separator + "output").mkdirs();
            // Should be in the same file, instead of creating different files.
-           String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
+//           String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
 
-           FileOutputStream out = new FileOutputStream(new File(AbstractFileCompleted));
-           wb.write(out);
-           out.close();
-           fins.close();
+           wb.write(outputFile);
        }
        catch (Exception e) {
           e.printStackTrace();
