@@ -34,7 +34,15 @@ public class AbstractDoiFinder {
       try{
          File inputFile = FindInputFile(args);
          File outputFile = CreateOutput(inputFile);
-
+         
+         // This part needs additional work.
+         XSSFWorkbook wb = new XSSFWorkbook(inputFile);
+         int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
+         for (int sheetIndex=startingSheet; sheetIndex<wb.getNumberOfSheets(); sheetIndex++){        
+           ArrayList<String> searchList = Read_From_Excel(sheetIndex, outputFile); // Returns a searchList that has the author's name and all of the titles for our search query
+           ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
+           Write_To_Excel(contentList, sheetIndex, outputFile); // Currently only does one sheet at a time and needs to be manually update
+      }
          
          System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          
@@ -275,14 +283,11 @@ public class AbstractDoiFinder {
     
     }
 
-    public static ArrayList<String> Read_From_Excel(int sheetIndex) throws IOException, Exception{
+    public static ArrayList<String> Read_From_Excel(int sheetIndex, File outputFile) throws IOException, Exception{
        
        ArrayList<String> searchList = new ArrayList<String>();
-       
-       String BasePath = EstablishFilePath();
-       String SourceFile = BasePath + File.separator + "input" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
-       
-       FileInputStream fins = new FileInputStream(new File(SourceFile));
+      
+       FileInputStream fins = new FileInputStream(outputFile);
 
        XSSFWorkbook wb = new XSSFWorkbook(fins); // creates a workbook that we can search, which allows us to get the author's name and the titles of each publication
        // TODO: I believe the fins file is not required.
@@ -341,15 +346,12 @@ public class AbstractDoiFinder {
 
     // old params: ArrayList<String> writingList, ArrayList<String> doiList
     // new param because of new modified method: ArrayList<ArrayList<String>>
-    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex) throws Exception {
+    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex, File outputFile) throws Exception {
         try {
-            String BasePath = EstablishFilePath();
-            String AbstractFile = BasePath + File.separator + "input" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23.xlsx";
-
            ArrayList<String> abstractList = writeList.get(0);
            ArrayList<String> doiList = writeList.get(1); 
 
-           FileInputStream fins = new FileInputStream(new File(AbstractFile)); 
+           FileInputStream fins = new FileInputStream(outputFile); 
 
            XSSFWorkbook wb = new XSSFWorkbook(fins);
 
@@ -405,6 +407,7 @@ public class AbstractDoiFinder {
            }
 
            // TO REMOVE
+           String BasePath = EstablishFilePath(); // Current folder.
            new File(BasePath + File.separator + "output").mkdirs();
            String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
 
