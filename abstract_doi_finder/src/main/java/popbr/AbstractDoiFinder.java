@@ -38,7 +38,7 @@ public class AbstractDoiFinder {
          // This part needs additional work.
          XSSFWorkbook wb = new XSSFWorkbook(inputFile);
          int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
-         for (int sheetIndex=startingSheet; sheetIndex<wb.getNumberOfSheets(); sheetIndex++){        
+         for (int sheetIndex=startingSheet; sheetIndex<wb.getNumberOfSheets(); sheetIndex++){ // TODO : try small first ;-) 
            ArrayList<String> searchList = Read_From_Excel(sheetIndex, outputFile); // Returns a searchList that has the author's name and all of the titles for our search query
            ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
            Write_To_Excel(contentList, sheetIndex, outputFile); // Currently only does one sheet at a time and needs to be manually update
@@ -409,6 +409,7 @@ public class AbstractDoiFinder {
            // TO REMOVE
            String BasePath = EstablishFilePath(); // Current folder.
            new File(BasePath + File.separator + "output").mkdirs();
+           // Should be in the same file, instead of creating different files.
            String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
 
            FileOutputStream out = new FileOutputStream(new File(AbstractFileCompleted));
