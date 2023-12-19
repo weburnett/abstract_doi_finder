@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import java.util.Date;
 import java.util.ArrayList;
 
 import java.net.UnknownHostException;
@@ -32,19 +33,62 @@ public class AbstractDoiFinder {
        */
       System.out.println("Welcome to Abstract/DOI Finder.");
       try{
-         File inputFile = FindInputFile(args);
-         File outputFile = CreateOutput(inputFile);
-         
+         File inputPath = FindInputFile(args);
+         if(inputPath.length() == 0 ){ // If the file returned is empty.
+            System.out.println("This file seems to be empty.\nPlease check " + inputPath + ".");
+         }
+         else{ // If the file returned is not empty.
+            FileOutputStream outputFile = CreateOutput(inputPath);
+         }
          // This part needs additional work.
-         XSSFWorkbook wb = new XSSFWorkbook(inputFile);
+//         XSSFWorkbook wb = new XSSFWorkbook(outputFile);
+         
+         // Temp
+         
+  //       XSSFSheet sheet = wb.getSheetAt(2);
+         
+          // 1 = value of new row (vertical)
+          // 10 =  Value of new column (horizontal)
+//         sheet.getRow(1).createCell(10, CellType.STRING).setCellValue("Test");
+    //  wb.write();      
+         
+         /*
+         
+         int cols = sheet.getRow(0).getLastCellNum(); //gets the number of columns in the sheet
+         XSSFRow row = sheet.getRow(0);
+         for(int i = 0; i < cols; i++)
+         {
+            XSSFCell cell = row.getCell(i);
+            if (cell == null) // if the cell is null for whatever reason, it will throw an error when trying to get the cell type
+               continue;
+            if (cell.getCellType() == CellType.STRING)
+            {
+               String valueOfCell = cell.getStringCellValue();
+               if (valueOfCell.toUpperCase().equals("DOI"))
+               {
+                  System.out.println("Found DOI");
+                  for (int l = 1; l <= 10; l++)
+                  {
+                     row = sheet.getRow(l); // sets us on the correct row
+                     row.createCell(i, CellType.STRING).setCellValue("TEST");
+                  }
+                  row = sheet.getRow(0); //sets the row back to 0 after running
+               }
+               
+               */
+         
+         /*
          int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
-         for (int sheetIndex=startingSheet; sheetIndex<wb.getNumberOfSheets(); sheetIndex++){ // TODO : try small first ;-) 
+         for (int sheetIndex=startingSheet; sheetIndex< 3
+              //wb.getNumberOfSheets()
+              ; sheetIndex++){ // TODO : try small first ;-) 
            ArrayList<String> searchList = Read_From_Excel(sheetIndex, outputFile); // Returns a searchList that has the author's name and all of the titles for our search query
            ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
            Write_To_Excel(contentList, sheetIndex, outputFile); // Currently only does one sheet at a time and needs to be manually update
       }
          
          System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
+         */
          
          
       } catch(IOException e) {
@@ -68,7 +112,7 @@ public class AbstractDoiFinder {
        // We first make sure that the input/ folder exists.
        String BasePath = EstablishFilePath(); // Current folder.
        File inputFolder = new File(BasePath + File.separator + "input"); // Input folder.
-       File inputFile; // This variable will hold the file to process.
+       File inputPath; // This variable will hold the file (path) to process.
        
        // Create a FileFilter, cf. https://www.geeksforgeeks.org/file-listfiles-method-in-java-with-examples/
        // This will let us filter files that ends with xlsx
@@ -100,58 +144,65 @@ public class AbstractDoiFinder {
              }
              else{ // there is exactly one spreadsheet in the input/ folder
                 System.out.println("I found exactly one spreadsheet in the input folder:\n\t" + filesInInputFolder[0] + "\nAnd will process that file.");
-                inputFile = filesInInputFolder[0];
+                inputPath = filesInInputFolder[0];
              }
           }
           else{ // The user provided an argument.
-             inputFile = new File(BasePath + File.separator + "input" + File.separator + args[0]);
-             if (!inputFile.exists()){
-                throw new IOException("You requested that I process the file\n\t" + inputFile + "\nBut this file does not seem to exist.");
+             inputPath = new File(BasePath + File.separator + "input" + File.separator + args[0]);
+             if (!inputPath.exists()){
+                throw new IOException("You requested that I process the file\n\t" + inputPath + "\nBut this file does not seem to exist.");
              }
-             else if (!inputFile.getName().endsWith("xlsx")) { // If the argument does not match a file, or if 
-                throw new IOException("You requested that I process the file\n\t" + inputFile + "\nBut this file does not seem to be a spreadsheet.");
+             else if (!inputPath.getName().endsWith("xlsx")) { // If the argument does not match a file, or if 
+                throw new IOException("You requested that I process the file\n\t" + inputPath + "\nBut this file does not seem to be a spreadsheet.");
              }
              else { // The file exists, and it ends with xlsx
-                System.out.println("Ok, I will now process:\n\t" + inputFile + "\n");
+                System.out.println("Ok, I will now process:\n\t" + inputPath + "\n");
              }
           }
        }
-       return inputFile;
+       return inputPath;
     }
     
-    public static File CreateOutput(File inputFile) throws Exception{
+    public static FileOutputStream CreateOutput(File inputPath) throws Exception{
       /*
        * First, we copy the input sheet into the output folder.
        */
        String BasePath = EstablishFilePath(); // Current folder.
        // We first create the output/ folder
        new File(BasePath + File.separator + "output").mkdirs();
-       File outputFile = new File(BasePath + File.separator + "output" + File.separator + inputFile.getName());
-       if (outputFile.exists()){
-          throw new IOException("It seems that the file\n\t" + outputFile + "\nalready exists. Please rename it so that it doesn't get overridden.");
+       String timeStamp = new java.text.SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+       File outputPath = new File(BasePath + File.separator + "output" + File.separator + timeStamp + ".xlsx");
+       if (outputPath.exists()){
+          throw new IOException("It seems that the file\n\t" + outputPath + "\nalready exists. Please rename it so that it doesn't get overridden.");
       }
-       // FileUtils.copyFile(inputFile, outputFile, false); // Cf. https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html#copyFile(java.io.File,java.io.File,boolean)
-       // ^ not required anymore, we write only after the file was edited. This may be bad practise.
+      FileOutputStream outputFile = new FileOutputStream(outputPath);
       
       /*
        * Now, we shift the columns.
        */
       
-      XSSFWorkbook wb = new XSSFWorkbook(inputFile);
+      XSSFWorkbook wb = new XSSFWorkbook(inputPath);
+      
+      // Workbook wb = new XSSFWorkbook();
+      //do your stuff ...
+      
+//      wb.write(out);
+      
       Sheet sheet;
       int noOfColumns;
       int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
       int newColumn = 10;  // This is bad practise: I am assuming that the new row needs to be the 10th.
+      // in the previous version of the program, "For right now, I put them right before the number of coauthors column."
       for (int sn=startingSheet; sn<wb.getNumberOfSheets(); sn++) { 
          sheet = wb.getSheetAt(sn);
          noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();  // This is bad practise: I am assuming that each row has the same number of columns as the first one.
          sheet.shiftColumns(newColumn, noOfColumns, 1);
          sheet.getRow(0).createCell(newColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers.
+         sheet.getRow(1).createCell(newColumn, CellType.STRING).setCellValue("Test");
       }
-      FileOutputStream out = new FileOutputStream(outputFile);
-      wb.write(out);
-      out.close();
+      wb.write(outputFile);
       return outputFile;
+      
    }
 
    // make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
@@ -311,11 +362,11 @@ public class AbstractDoiFinder {
        {
           XSSFCell cell = row.getCell(i);
 
-          // tests if the cell is null, since testing the cell type would throw an error if null
+          // tests if the cell is null, since testing the cell type would throw an error if null (<= this is not the case. Why?)
           // This is only intended for the titles of each column in our target excel file, since we will not need data from any other column
 
           if (cell == null) 
-             continue;
+             continue; // Well, we don't actually throw an error. Why not?
           if (cell.getCellType() == CellType.STRING)
           {
              String cellValue = cell.getStringCellValue(); // gets the value of the cell if it is a string value
