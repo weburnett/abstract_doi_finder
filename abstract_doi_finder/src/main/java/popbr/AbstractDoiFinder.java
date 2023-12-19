@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import org.apache.commons.io.FileUtils;
 
@@ -33,19 +34,7 @@ public class AbstractDoiFinder {
       try{
          File inputFile = FindInputFile(args);
          File outputFile = CreateOutput(inputFile);
-         
-         // This part needs additional work.
-         /*
-          * 
-          * for (int sheetIndex = 2; sheetIndex < 57; sheetIndex++){ // We are hard-coding the sheets that we are exploring.
-          * 
-          *  ArrayList<String> searchList = Read_From_Excel(sheetIndex); // Returns a searchList that has the author's name and all of the titles for our search query
-          * 
-          *  ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
-          * 
-          *  Write_To_Excel(contentList, sheetIndex); // Currently only does one sheet at a time and needs to be manually update
-      }
-      */
+
          
          System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          
@@ -123,6 +112,9 @@ public class AbstractDoiFinder {
     }
     
     public static File CreateOutput(File inputFile) throws Exception{
+      /*
+       * First, we copy the input sheet into the output folder.
+       */
        String BasePath = EstablishFilePath(); // Current folder.
        // We first create the output/ folder
        new File(BasePath + File.separator + "output").mkdirs();
@@ -130,11 +122,31 @@ public class AbstractDoiFinder {
        if (outputFile.exists()){
           throw new IOException("It seems that the file\n\t" + outputFile + "\nalready exists. Please rename it so that it doesn't get overridden.");
       }
-       FileUtils.copyFile(inputFile, outputFile, false); // Cf. https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html#copyFile(java.io.File,java.io.File,boolean)
-       return outputFile;
+       // FileUtils.copyFile(inputFile, outputFile, false); // Cf. https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html#copyFile(java.io.File,java.io.File,boolean)
+       // ^ not required anymore, we write only after the file was edited. This may be bad practise.
+      
+      /*
+       * Now, we shift the columns.
+       */
+      
+      XSSFWorkbook wb = new XSSFWorkbook(inputFile);
+      Sheet sheet;
+      int noOfColumns;
+      int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
+      int newColumn = 10;  // This is bad practise: I am assuming that the new row needs to be the 10th.
+      for (int sn=startingSheet; sn<wb.getNumberOfSheets(); sn++) { 
+         sheet = wb.getSheetAt(sn);
+         noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();  // This is bad practise: I am assuming that each row has the same number of columns as the first one.
+         sheet.shiftColumns(newColumn, noOfColumns, 1);
+         sheet.getRow(0).createCell(newColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers.
+      }
+      FileOutputStream out = new FileOutputStream(outputFile);
+      wb.write(out);
+      out.close();
+      return outputFile;
    }
 
-// make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
+   // make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
     // need to figure out how to differentiate between what threw an error (we now are doing two things that can throw a NullPointerException 
     // and we don't want the error to crash the program because of the amount of entries we have --> right now, I'm just making it set the text for both to not having
     // one, even if it does have one, but not the other
@@ -273,6 +285,7 @@ public class AbstractDoiFinder {
        FileInputStream fins = new FileInputStream(new File(SourceFile));
 
        XSSFWorkbook wb = new XSSFWorkbook(fins); // creates a workbook that we can search, which allows us to get the author's name and the titles of each publication
+       // TODO: I believe the fins file is not required.
        
        /*
         Currently manually inputting the sheet index
