@@ -39,63 +39,18 @@ public class AbstractDoiFinder {
          }
          else{ // If the file returned is not empty.
             File outputPath = CreateOutput(inputPath);
-            
+             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
+             int number_of_sheets = wb.getNumberOfSheets();
             int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
-         for (int sheetIndex=startingSheet; sheetIndex< 3
-              //wb.getNumberOfSheets()
-              ; sheetIndex++){ // TODO : try small first ;-) 
+         for (int sheetIndex=startingSheet; sheetIndex< number_of_sheets; sheetIndex++){ // TODO : try small first ;-) 
            ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
            ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
            Write_To_Excel(contentList, sheetIndex, outputPath); // Currently only does one sheet at a time and needs to be manually update
       }
       //TODO Error message "Cleaning up unclosed ZipFile for archive /donnees/travail/git/abstract_doi_finder/abstract_doi_finder/input/Publication_Abstracts_Only_Dataset_9-26-23.xlsx"
-      // Something is amiss. The sheet has0sheets, but I am looking for sheet #2
-         
-         
          System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          }
-         // This part needs additional work.
-//         XSSFWorkbook wb = new XSSFWorkbook(outputFile);
-         
-         // Temp
-         
-  //       XSSFSheet sheet = wb.getSheetAt(2);
-         
-          // 1 = value of new row (vertical)
-          // 10 =  Value of new column (horizontal)
-//         sheet.getRow(1).createCell(10, CellType.STRING).setCellValue("Test");
-    //  wb.write();      
-         
-         /*
-         
-         int cols = sheet.getRow(0).getLastCellNum(); //gets the number of columns in the sheet
-         XSSFRow row = sheet.getRow(0);
-         for(int i = 0; i < cols; i++)
-         {
-            XSSFCell cell = row.getCell(i);
-            if (cell == null) // if the cell is null for whatever reason, it will throw an error when trying to get the cell type
-               continue;
-            if (cell.getCellType() == CellType.STRING)
-            {
-               String valueOfCell = cell.getStringCellValue();
-               if (valueOfCell.toUpperCase().equals("DOI"))
-               {
-                  System.out.println("Found DOI");
-                  for (int l = 1; l <= 10; l++)
-                  {
-                     row = sheet.getRow(l); // sets us on the correct row
-                     row.createCell(i, CellType.STRING).setCellValue("TEST");
-                  }
-                  row = sheet.getRow(0); //sets the row back to 0 after running
-               }
-               
-               */
-         
-         /*
-         
-         */
-         
-         
+          
       } catch(IOException e) {
          System.out.println(e.getMessage());
          System.exit(0);
@@ -339,31 +294,25 @@ public class AbstractDoiFinder {
        FileInputStream fins = new FileInputStream(inputPath);
 
        XSSFWorkbook wb = new XSSFWorkbook(fins); // creates a workbook that we can search, which allows us to get the author's name and the titles of each publication
-       // TODO: I believe the fins file is not required.
        if (wb.getNumberOfSheets() < sheetIndex){
           System.out.println("Inside Read_From_Excel, something is amiss. The sheet has" + wb.getNumberOfSheets() + "sheets, but I am looking for sheet #" + sheetIndex);
       }
        
        /*
-        Currently manually inputting the sheet index
-        Starting at 2 which would be:
-        "Bothwell, A Pub Abstracts"
-        
-        UPDATED: now, parameter sheetIndex gives sheet to be extracted.
-       */
-
+        *  Parameter sheetIndex gives sheet to be extracted.
+        */
        XSSFSheet sheet = wb.getSheetAt(sheetIndex);
 
        int rows = sheet.getLastRowNum(); // gets number of rows
        int cols = sheet.getRow(0).getLastCellNum(); // gets the number of columns
 
-       XSSFRow row = sheet.getRow(0); // starting the row at 0 for sheet 2
+       XSSFRow row = sheet.getRow(0); // starting the row at 0 for current sheet.
 
        for (int i = 0; i < cols; i++)
        {
           XSSFCell cell = row.getCell(i);
 
-          // tests if the cell is null, since testing the cell type would throw an error if null (<= this is not the case. Why?)
+          // tests if the cell is null, since testing the cell type would throw an error if null (<= this is not the case, we are not throwing an error. Why?)
           // This is only intended for the titles of each column in our target excel file, since we will not need data from any other column
 
           if (cell == null) 
@@ -391,13 +340,10 @@ public class AbstractDoiFinder {
           }
        }
        fins.close(); //closes the inputstream
-
        // the author's name will always be the first index followed by the titles
        return searchList;
     }
 
-    // old params: ArrayList<String> writingList, ArrayList<String> doiList
-    // new param because of new modified method: ArrayList<ArrayList<String>>
     public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex, File outputPath) throws Exception {
         try {
            ArrayList<String> abstractList = writeList.get(0);
@@ -408,15 +354,10 @@ public class AbstractDoiFinder {
               System.out.println("Indiside Write_To_Excel, something is amiss. The sheet has" + wb.getNumberOfSheets() + "sheets, but I am looking for sheet #" + sheetIndex);
            }
            
-
-           // Currently manually inputting the sheet index
-           // Starting at 2 which would be:
-           // "Bothwell, A Pub Abstracts"
-           
-           // UPDATED: now look at sheetIndex sheet.
+           /*
+            *  Parameter sheetIndex gives sheet to be extracted.
+            */
            XSSFSheet sheet = wb.getSheetAt(sheetIndex);
-
-           //int rows = sheet.getLastRowNum(); //gets the number of rows in the sheet
 
            // SocketTimeoutException causing it to not work in some cases
            // Using the size of the list allows us to still run the code
@@ -431,7 +372,7 @@ public class AbstractDoiFinder {
            {
               XSSFCell cell = row.getCell(i);
               if (cell == null) // if the cell is null for whatever reason, it will throw an error when trying to get the cell type
-                 continue;
+                 continue; // Well, we don't actually throw an error. Why not?
               if (cell.getCellType() == CellType.STRING)
               {
                  String valueOfCell = cell.getStringCellValue();
@@ -459,12 +400,6 @@ public class AbstractDoiFinder {
                  }
               }
            }
-
-           // TO REMOVE
-//           String BasePath = EstablishFilePath(); // Current folder.
-//           new File(BasePath + File.separator + "output").mkdirs();
-           // Should be in the same file, instead of creating different files.
-//           String AbstractFileCompleted = BasePath + File.separator + "output" + File.separator + "Publication_Abstracts_Only_Dataset_9-26-23_" + sheetIndex + ".xlsx";
             FileOutputStream fos = new FileOutputStream(outputPath);
            wb.write(fos);
        }
@@ -491,6 +426,8 @@ public class AbstractDoiFinder {
        return doiText;
     }
 
+    // This method can probably be replaced by a standard Java API.
+    // Many shorter and more standard solutions are described at https://stackoverflow.com/q/4871051.
     public static String EstablishFilePath() throws Exception {
         try {
 
