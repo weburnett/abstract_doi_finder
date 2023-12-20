@@ -278,8 +278,8 @@ public class AbstractDoiFinder {
                if (doiList.get(k).equals("no doi on PubMed"))
                   doiCount++;
             }
-    System.out.println("Number of publications that did not have an abstract on PubMed: " + count);
-    System.out.println("Number of publications that did not have a DOI on PubMed: " + doiCount);
+    System.out.println("Number of publications that did not have an abstract on PubMed: " + count); // TODO: we could present this information as found / total.
+    System.out.println("Number of publications that did not have a DOI on PubMed: " + doiCount); // TODO: we could present this information as found / total.
 
     returnedList.add(abstractList);
     returnedList.add(doiList);
