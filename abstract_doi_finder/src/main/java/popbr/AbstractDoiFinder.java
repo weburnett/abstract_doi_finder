@@ -39,18 +39,18 @@ public class AbstractDoiFinder {
          }
          else{ // If the file returned is not empty.
             File outputPath = CreateOutput(inputPath);
-             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
-             int number_of_sheets = wb.getNumberOfSheets();
-            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
-         for (int sheetIndex=startingSheet; sheetIndex< number_of_sheets; sheetIndex++){ // TODO : try small first ;-) 
-           ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
-           ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
-           Write_To_Excel(contentList, sheetIndex, outputPath); // Currently only does one sheet at a time and needs to be manually update
-      }
-      //TODO Error message "Cleaning up unclosed ZipFile for archive /donnees/travail/git/abstract_doi_finder/abstract_doi_finder/input/Publication_Abstracts_Only_Dataset_9-26-23.xlsx"
-         System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
+            XSSFWorkbook wb = new XSSFWorkbook(outputPath);
+            int number_of_sheets = wb.getNumberOfSheets();
+            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts. 
+            for (int sheetIndex=startingSheet; sheetIndex< number_of_sheets; sheetIndex++){
+               ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
+               ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
+               Write_To_Excel(contentList, sheetIndex, outputPath); // Currently only does one sheet at a time and needs to be manually update
+            }
+            //TODO Error message "Cleaning up unclosed ZipFile for archive /donnees/travail/git/abstract_doi_finder/abstract_doi_finder/input/Publication_Abstracts_Only_Dataset_9-26-23.xlsx"
+            System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          }
-          
+         
       } catch(IOException e) {
          System.out.println(e.getMessage());
          System.exit(0);
