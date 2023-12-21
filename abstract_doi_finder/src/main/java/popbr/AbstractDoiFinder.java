@@ -42,7 +42,16 @@ public class AbstractDoiFinder {
             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
             int number_of_sheets = wb.getNumberOfSheets();
             wb.close();
-            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts. 
+            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts.
+            // Cf. https://github.com/popbr/abstract_doi_finder/issues/9 on how to address that.
+            /* 
+             * This is the main part of the program.
+             * For each sheet, between startingSheet and number_of_sheets, it 
+             *     - reads from the sheet the various values needed to perform the queryy (Read_From_Excel), 
+             *     - performs the queries (RetrieveData), 
+             *     - writes the data retrieved (Write_To_Excel) in the appropriate sheet.
+             * This is the time-consuming part.
+             */
             for (int sheetIndex=startingSheet; sheetIndex< number_of_sheets; sheetIndex++){
                ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
                ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
