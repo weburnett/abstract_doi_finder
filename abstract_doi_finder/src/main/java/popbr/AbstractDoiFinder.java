@@ -38,12 +38,15 @@ public class AbstractDoiFinder {
             System.out.println("This file seems to be empty.\nPlease check " + inputPath + ".");
          }
          else{ // If the file returned is not empty.
+            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts.
+            // Cf. https://github.com/popbr/abstract_doi_finder/issues/9 on how to address that.
+            // And on how to get a more clever way of bounding the number of sheets explored.
+            
+            // We now open the spreadsheet to count its number of sheets.
             File outputPath = CreateOutput(inputPath);
             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
             int number_of_sheets = wb.getNumberOfSheets();
             wb.close();
-            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts.
-            // Cf. https://github.com/popbr/abstract_doi_finder/issues/9 on how to address that.
             /* 
              * This is the main part of the program.
              * For each sheet, between startingSheet and number_of_sheets, it 
