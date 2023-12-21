@@ -1,0 +1,32 @@
+name: Remote Execution
+ 
+#The following only runs when pushed on the source code for the Installation_Test directory
+
+on:
+  push:
+    paths:
+    - 'output/**.xlsx'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: maven
+      - name: Build with Maven Installation_Test
+        run: |
+          cd abstract_doi_finder
+          mvn compile
+          mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder"
+      # This should save an excel sheet to the specified path with the artifact being a zipped folder called Installation_Test-artifact.zip.
+      - name: Save artifact
+        uses: actions/upload-artifact@v3
+        with:
+            name: Remote_execution
+            path: output
