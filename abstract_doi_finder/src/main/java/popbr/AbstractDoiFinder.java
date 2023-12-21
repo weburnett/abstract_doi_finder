@@ -41,6 +41,7 @@ public class AbstractDoiFinder {
             File outputPath = CreateOutput(inputPath);
             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
             int number_of_sheets = wb.getNumberOfSheets();
+            wb.close();
             int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts. 
             for (int sheetIndex=startingSheet; sheetIndex< number_of_sheets; sheetIndex++){
                ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
