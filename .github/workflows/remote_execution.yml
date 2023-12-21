@@ -5,7 +5,7 @@ name: Remote Execution
 on:
   push:
     paths:
-    - 'input/**.xlsx'
+    - 'abstract_doi_finder/input/**.xlsx'
 
 jobs:
   build:
