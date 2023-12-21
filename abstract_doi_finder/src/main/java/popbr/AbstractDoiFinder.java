@@ -48,11 +48,9 @@ public class AbstractDoiFinder {
                ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
                Write_To_Excel(contentList, sheetIndex, outputPath); // Currently only does one sheet at a time and needs to be manually update
             }
-            //TODO Error message "Cleaning up unclosed ZipFile for archive /donnees/travail/git/abstract_doi_finder/abstract_doi_finder/input/Publication_Abstracts_Only_Dataset_9-26-23.xlsx"
             System.out.println("Thanks for coming! Your abstracts and DOIs should be in your Excel file now");
          }
-         
-      } catch(IOException e) {
+      } catch(IOException e) { // Those are the exceptions returned by the CreateOutput method.
          System.out.println(e.getMessage());
          System.exit(0);
       }
