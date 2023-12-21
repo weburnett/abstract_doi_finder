@@ -81,7 +81,7 @@ public class AbstractDoiFinder {
    
    public static File FindInputFile(String[] args) throws Exception {
       // We first make sure that the input/ folder exists.
-      String BasePath = EstablishFilePath(); // Current folder.
+      String BasePath = System.getProperty("user.dir"); // Current folder.
       File inputFolder = new File(BasePath + File.separator + "input"); // Input folder.
       File inputPath; // This variable will hold the file (path) to process.
       
@@ -138,7 +138,7 @@ public class AbstractDoiFinder {
       /*
        * First, we make sure that the name we want to use is available.
        */
-      String BasePath = EstablishFilePath(); // Current folder.
+      String BasePath = System.getProperty("user.dir"); // Current folder.
       // We first create the output/ folder
       new File(BasePath + File.separator + "output").mkdirs();
       String timeStamp = new java.text.SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
@@ -439,33 +439,5 @@ public class AbstractDoiFinder {
          return doiText;
       }
       return doiText;
-   }
-   
-   // This method can probably be replaced by a standard Java API.
-   // Many shorter and more standard solutions are described at https://stackoverflow.com/q/4871051.
-   public static String EstablishFilePath() throws Exception {
-      try {
-         
-         //This creates a dummy file that starts as the basis for creating the filepath in the base of the program
-         File s = new File("f.txt");
-         String FilePath = "";
-         
-         //This gets the filepath of the dummy file and transforms it into characters, so it can be modified.
-         //The modification snips off the charcters "f.txt" so that the only path left is the base filepath
-         char[] tempChar = s.getAbsolutePath().toCharArray();
-         char[] newChar = new char[tempChar.length - 6];
-         for (int i = 0; i < newChar.length; i++) {
-            newChar[i] = tempChar[i];
-         }
-         //This makes the filepath into a string, minus the "f.txt" bit
-         FilePath = String.valueOf(newChar);
-         //System.out.println(FilePath);
-         //This returns the filepath
-         return FilePath;
-         
-      } catch (Exception e) {
-         e.printStackTrace();
-         return "failed to find filepath";
-      }
    }
 }
