@@ -158,7 +158,7 @@ public class AbstractDoiFinder {
       int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
       int newColumn = 10;  // This is bad practise: I am assuming that the new row needs to be the 10th.
       // in the previous version of the program, "For right now, I put them right before the number of coauthors column."
-      for (int sn=startingSheet; sn<wb.getNumberOfSheets(); sn++) { 
+      for (int sn=startingSheet; sn<wb.getNumberOfSheets()-1; sn++) { 
          sheet = wb.getSheetAt(sn);
          noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();  // This is bad practise: I am assuming that each row has the same number of columns as the first one.
          sheet.shiftColumns(newColumn, noOfColumns, 1);
