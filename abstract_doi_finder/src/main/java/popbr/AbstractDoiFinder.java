@@ -146,23 +146,25 @@ public class AbstractDoiFinder {
       if (outputPath.exists()){
          throw new IOException("It seems that the file\n\t" + outputPath + "\nalready exists. Please rename it so that it doesn't get overridden.");
       }
-      FileOutputStream outputFile = new FileOutputStream(outputPath);
-      
+   
+      FileOutputStream outputFile = new FileOutputStream(outputPath); // FileOutputStream needed for write operation later on.
+      FileUtils.copyFile(inputPath, outputPath); // We make a simple "file" copy of the input sheet in the target path.
+            
       /*
-       * Now, we open the inputPath spreadsheet and shift the columns to insert a DOI column in 10th row.
+       * Now, we open the outputPath spreadsheet and shift the columns to insert a DOI column in 10th row.
        */
       
-      XSSFWorkbook wb = new XSSFWorkbook(inputPath);
+      XSSFWorkbook wb = new XSSFWorkbook(outputPath);
       Sheet sheet;
       int noOfColumns;
-      int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to be shifted. 
-      int newColumn = 11;  // This is bad practise: I am assuming that the new row needs to be the 10th.
+      int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 2 (included) needs to be shifted. 
+      int newColumn = 11;    // This is bad practise: I am assuming that the new row needs to be the 11th.
       // in the previous version of the program, "For right now, I put them right before the number of coauthors column."
       for (int sn=startingSheet; sn<wb.getNumberOfSheets(); sn++) { 
          sheet = wb.getSheetAt(sn);
          noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();  // This is bad practise: I am assuming that each row has the same number of columns as the first one.
          sheet.shiftColumns(newColumn, noOfColumns, 1);
-         sheet.getRow(0).createCell(newColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers.
+         sheet.getRow(0).createCell(newColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers. Something with getCellStyleAt?
       }
       
       /*
@@ -170,10 +172,8 @@ public class AbstractDoiFinder {
        */
       
       wb.write(outputFile);
-      outputFile.close();
       wb.close();
       return outputPath;
-      
    }
    
    // make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
