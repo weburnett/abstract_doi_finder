@@ -27,6 +27,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.lang.Thread;
+
 public class AbstractDoiFinder {
    public static void main(String[] args) throws Exception {
       /*
@@ -158,12 +160,16 @@ public class AbstractDoiFinder {
       XSSFWorkbook wb = new XSSFWorkbook(outputPath);
 
       wb = ShiftColumns(wb);
+      System.out.println("Made it out of the new method");
 
       /*
        * Finally, we write the spreadsheet we obtained in the outputFile and return its path.
        */
       
+      Thread.sleep(5000);
       wb.write(outputFile);
+      System.out.println("It's the write again");
+      outputFile.close();
       wb.close();
       return outputPath;
    }
@@ -206,12 +212,14 @@ public class AbstractDoiFinder {
          if (Boolean.FALSE.equals(hasAbstractColumn))
          {
             sheet.shiftColumns(abstractColumn, noOfColumns, 1);
-            sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellValue("Abstract");
+            sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
+            sheet.getRow(0).getCell(abstractColumn).setCellValue("Abstract"); // Then we add the desired attribute name to the cell
          }
          if (Boolean.FALSE.equals(hasDOIColumn))
          {
             sheet.shiftColumns(doiColumn, noOfColumns, 1);
-            sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers. Something with getCellStyleAt?
+            sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
+            sheet.getRow(0).getCell(doiColumn).setCellValue("DOI"); // Then we add the desired attribute name to the cell
          }
          
       }
