@@ -18,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Cell;
 
 import org.apache.commons.io.FileUtils;
 
@@ -155,18 +156,9 @@ public class AbstractDoiFinder {
        */
       
       XSSFWorkbook wb = new XSSFWorkbook(outputPath);
-      Sheet sheet;
-      int noOfColumns;
-      int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 2 (included) needs to be shifted. 
-      int newColumn = 11;    // This is bad practise: I am assuming that the new row needs to be the 11th.
-      // in the previous version of the program, "For right now, I put them right before the number of coauthors column."
-      for (int sn=startingSheet; sn<wb.getNumberOfSheets(); sn++) { 
-         sheet = wb.getSheetAt(sn);
-         noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();  // This is bad practise: I am assuming that each row has the same number of columns as the first one.
-         sheet.shiftColumns(newColumn, noOfColumns, 1);
-         sheet.getRow(0).createCell(newColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers. Something with getCellStyleAt?
-      }
-      
+
+      wb = ShiftColumns(wb);
+
       /*
        * Finally, we write the spreadsheet we obtained in the outputFile and return its path.
        */
@@ -174,6 +166,56 @@ public class AbstractDoiFinder {
       wb.write(outputFile);
       wb.close();
       return outputPath;
+   }
+
+   public static XSSFWorkbook ShiftColumns(XSSFWorkbook wb) throws Exception {
+      int startingSheet = 2; // This is bad practise: We're am assuming that the sheets starting with the 2 (included) needs to be shifted.
+      int abstractColumn = 10, doiColumn = 11; // Our template will probably have these columns in these spots here
+      boolean hasAbstractColumn = false, hasDOIColumn = false; // If the sheet has a column, we do not want to add another one of the same type
+
+      /* 
+        Loops through every sheet of the workbook to see if an abstract or doi column already exists.
+        If it does, it does not make a new column for our specified attributes.
+        If not, it makes a new column for the missing column.
+
+        Additionally, we take the liberty of where the abstract and doi columns go if they do not exist.
+        This can be reworked later.
+      */
+      for (int sn = startingSheet; sn < wb.getNumberOfSheets(); sn++)
+      {
+         hasAbstractColumn = false;
+         hasDOIColumn = false; // resets the boolean values back to false before switching to the next sheet
+         Sheet sheet = wb.getSheetAt(sn);
+         int noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells(); // This is bad practise: We're am assuming that each row has the same number of columns as the first one.
+
+         for (int i = 0; i < noOfColumns; i++)
+         {
+            Cell cell = sheet.getRow(0).getCell(i);
+            if (cell == null)
+               continue;
+            if (cell.getCellType() == CellType.STRING)
+            {
+               String cellValue = cell.getStringCellValue();
+               if (cellValue.toLowerCase().equals("abstract") || cellValue.toLowerCase().equals("abstracts"))
+                  hasAbstractColumn = true;
+               if (cellValue.toLowerCase().equals("doi") || cellValue.toLowerCase().equals("dois"))
+                  hasDOIColumn = true;
+            }
+         }
+
+         if (Boolean.FALSE.equals(hasAbstractColumn))
+         {
+            sheet.shiftColumns(abstractColumn, noOfColumns, 1);
+            sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellValue("Abstract");
+         }
+         if (Boolean.FALSE.equals(hasDOIColumn))
+         {
+            sheet.shiftColumns(doiColumn, noOfColumns, 1);
+            sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellValue("DOI"); // TODO: set style as in other headers. Something with getCellStyleAt?
+         }
+         
+      }
+      return wb;
    }
    
    // make the new return type ArrayList<ArrayList<String>> to return two lists, so we can make this program a bit more efficient
