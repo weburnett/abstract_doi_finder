@@ -27,8 +27,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.lang.Thread;
-
 public class AbstractDoiFinder {
    public static void main(String[] args) throws Exception {
       /*
@@ -160,15 +158,12 @@ public class AbstractDoiFinder {
       XSSFWorkbook wb = new XSSFWorkbook(outputPath);
 
       wb = ShiftColumns(wb);
-      System.out.println("Made it out of the new method");
 
       /*
        * Finally, we write the spreadsheet we obtained in the outputFile and return its path.
        */
       
-      Thread.sleep(5000);
       wb.write(outputFile);
-      System.out.println("It's the write again");
       outputFile.close();
       wb.close();
       return outputPath;
@@ -192,6 +187,8 @@ public class AbstractDoiFinder {
          hasAbstractColumn = false;
          hasDOIColumn = false; // resets the boolean values back to false before switching to the next sheet
          Sheet sheet = wb.getSheetAt(sn);
+         if (sheet == null) // if the sheet is null, further lines will crash the program.
+            continue;
          int noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells(); // This is bad practise: We're am assuming that each row has the same number of columns as the first one.
 
          for (int i = 0; i < noOfColumns; i++)
