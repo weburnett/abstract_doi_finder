@@ -170,8 +170,8 @@ public class AbstractDoiFinder {
    }
 
    public static XSSFWorkbook ShiftColumns(XSSFWorkbook wb) throws Exception {
-      int startingSheet = 2; // This is bad practise: We're am assuming that the sheets starting with the 2 (included) needs to be shifted.
-      int abstractColumn = 10, doiColumn = 11; // Our template will probably have these columns in these spots here
+      int startingSheet = 2; // This is bad practise: We're assuming that the sheets starting with the 2 (included) needs to be shifted
+      int abstractColumn = 0, doiColumn = 0; // Initializing the values for the columns, it throws an error otherwise. (title should be part of the general format, although it will most likely be there anyway)
       boolean hasAbstractColumn = false, hasDOIColumn = false; // If the sheet has a column, we do not want to add another one of the same type
 
       /* 
@@ -199,6 +199,12 @@ public class AbstractDoiFinder {
             if (cell.getCellType() == CellType.STRING)
             {
                String cellValue = cell.getStringCellValue();
+               if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
+               {
+                  abstractColumn = i + 1;
+                  doiColumn = i + 2; // updates the values of where the columns should be since we are putting it after the title.
+                  System.out.println("Abstract and DOI column location has been updated...");
+               }
                if (cellValue.toLowerCase().equals("abstract") || cellValue.toLowerCase().equals("abstracts"))
                   hasAbstractColumn = true;
                if (cellValue.toLowerCase().equals("doi") || cellValue.toLowerCase().equals("dois"))
@@ -342,8 +348,10 @@ public class AbstractDoiFinder {
          if (doiList.get(k).equals("no doi on PubMed"))
             doiCount++;
       }
-      System.out.println("Number of publications that did not have an abstract on PubMed: " + count); // TODO: we could present this information as found / total.
-      System.out.println("Number of publications that did not have a DOI on PubMed: " + doiCount); // TODO: we could present this information as found / total.
+      System.out.println("Number of publications that did not have an abstract for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + count + "/" + abstractList.size()); // TODO: we could present this information as found / total.
+      System.out.println("Number of publications that had an abstract for the sheet with the author \'" + searchFor.get(0) + "\'' on PubMed: " + (abstractList.size() - count) + "/" + abstractList.size());
+      System.out.println("Number of publications that did not have a DOI for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + doiCount + "/" + doiList.size()); // TODO: we could present this information as found / total.
+      System.out.println("Number of publications that had a DOI for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + (doiList.size() - doiCount) + "/" + doiList.size());
       
       returnedList.add(abstractList);
       returnedList.add(doiList);
@@ -366,6 +374,7 @@ public class AbstractDoiFinder {
        *  Parameter sheetIndex gives sheet to be extracted.
        */
       XSSFSheet sheet = wb.getSheetAt(sheetIndex);
+      System.out.println("The program is currently working on the sheet: " + sheet.getSheetName());
       
       int rows = sheet.getLastRowNum(); // gets number of rows
       int cols = sheet.getRow(0).getLastCellNum(); // gets the number of columns
