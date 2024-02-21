@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import java.net.UnknownHostException;
 import java.net.MalformedURLException;
@@ -39,15 +40,79 @@ public class AbstractDoiFinder {
             System.out.println("This file seems to be empty.\nPlease check " + inputPath + ".");
          }
          else{ // If the file returned is not empty.
-            int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts.
+
+            int startingSheet;
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.println("\nWhich sheets would you like to run the program on? ");
+            System.out.println("Type \'*\' for all sheets, use - between numbers for a range, or type in each individual number separated by commas.");
+            System.out.println("Example: \'4-*\' means run the program from the fourth sheet to the last sheet.");
+            System.out.println("Example: \'2, 3, 4, 10, 12\' runs the programs on the specified sheets.");
+
+            File outputPath = CreateOutput(inputPath);
+            XSSFWorkbook wb = new XSSFWorkbook(outputPath);
+            int number_of_sheets = wb.getNumberOfSheets();
+
+            System.out.println("what is happening");
+            
+
+            String sheetInput = scanner.nextLine();
+            scanner.close();
+
+            String[] sheetNumbers = sheetInput.split("[, ]");
+            ArrayList<Integer> sheetNumbers2 = new ArrayList<Integer>(); // will come up with a better name for this soon
+
+            /*
+              The way I am trying to do it, it will need a starting index either way because if the user enters *, I'm going to have to make it 2
+              I will look for more ways when I am able to, but for now, I want to figure this out.
+             */
+
+            for (int i = 0; i < sheetNumbers.length; i++)
+            {
+               if (sheetNumbers[i].equals("*"))
+               {
+                  startingSheet = 2;
+                  break;
+               }
+               if (sheetNumbers[i].contains("-"))
+               {
+                  String[] rangeNumbers = sheetNumbers[i].split("-"); //should only have two numbers, the first in the range and the last "number"
+                  if (rangeNumbers[0].equals("*"))
+                     throw new Exception("You cannot include * as the first argument in a range. Please try again with different sheet selections.");
+                  
+                  if (rangeNumbers[1].equals("*"))
+                  {
+                     for (int j = Integer.parseInt(rangeNumbers[0]); j < number_of_sheets; j++)
+                        sheetNumbers2.add(j);
+                     continue;
+                  }
+                  else
+                  {
+                     for (int j = Integer.parseInt(rangeNumbers[0]); j < Integer.parseInt(rangeNumbers[1]); j++)
+                        sheetNumbers2.add(j);
+                     continue;
+                  }
+               }
+               sheetNumbers2.add(Integer.parseInt(sheetNumbers[i]));
+            }
+
+            wb.close();
+
+            for (int i = 0; i < sheetNumbers2.size(); i++)
+               System.out.println(sheetNumbers2.get(i));
+            startingSheet = sheetNumbers2.get(0);
+
+            //int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts.
             // Cf. https://github.com/popbr/abstract_doi_finder/issues/9 on how to address that.
             // And on how to get a more clever way of bounding the number of sheets explored.
             
             // We now open the spreadsheet to count its number of sheets.
-            File outputPath = CreateOutput(inputPath);
-            XSSFWorkbook wb = new XSSFWorkbook(outputPath);
-            int number_of_sheets = wb.getNumberOfSheets();
-            wb.close();
+             
+            //File outputPath = CreateOutput(inputPath);
+           // XSSFWorkbook wb = new XSSFWorkbook(outputPath);
+            //int number_of_sheets = wb.getNumberOfSheets();
+            //wb.close();
+            
             /* 
              * This is the main part of the program.
              * For each sheet, between startingSheet and number_of_sheets, it 
