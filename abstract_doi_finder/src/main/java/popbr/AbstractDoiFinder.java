@@ -163,6 +163,10 @@ public class AbstractDoiFinder {
              *     - writes the data retrieved (Write_To_Excel) in the appropriate sheet.
              * This is the time-consuming part.
              */
+            /*
+               Need to fix the program to include the new logic for when specific sheets are treated. 
+               It does not crash, but it would not run on the sheets provided right now. 
+             */
             for (int sheetIndex=startingSheet; sheetIndex < number_of_sheets; sheetIndex++){
                ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
                ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
