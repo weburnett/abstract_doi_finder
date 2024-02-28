@@ -459,9 +459,13 @@ public class AbstractDoiFinder {
          if (doiList.get(k).equals("no doi on PubMed"))
             doiCount++;
       }
-      System.out.println("Number of publications that did not have an abstract for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + count + "/" + abstractList.size()); // TODO: we could present this information as found / total.
+      /* 
+       * We now display information about the doi / abstract found.
+       * In comment, the code to display information about the doi / abstract *not* found.
+       */
+      // System.out.println("Number of publications that did not have an abstract for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + count + "/" + abstractList.size());
       System.out.println("Number of publications that had an abstract for the sheet with the author \'" + searchFor.get(0) + "\'' on PubMed: " + (abstractList.size() - count) + "/" + abstractList.size());
-      System.out.println("Number of publications that did not have a DOI for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + doiCount + "/" + doiList.size()); // TODO: we could present this information as found / total.
+      // System.out.println("Number of publications that did not have a DOI for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + doiCount + "/" + doiList.size());
       System.out.println("Number of publications that had a DOI for the sheet with the author \'" + searchFor.get(0) + "\' on PubMed: " + (doiList.size() - doiCount) + "/" + doiList.size());
       
       returnedList.add(abstractList);
