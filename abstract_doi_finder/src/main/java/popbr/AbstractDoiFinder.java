@@ -35,31 +35,70 @@ public class AbstractDoiFinder {
        */
       System.out.println("Welcome to Abstract/DOI Finder.");
       try{
-         File inputPath = FindInputFile(args);
+         String[] providedFile = new String[1];
+         String numberRange = "*";
+         if (args.length > 2)
+            throw new IOException("There are too many arguments. \nPlease try removing spaces in your file name or in your list of numbers.");
+         if (args.length == 2)
+         {
+            /*
+               Checks which argument is the excel file
+               If there are more than 1 argument, but neither is the excel file, we stop the program.
+               Right now, the way the arguments are input are very important and could lead to user error.
+             */
+            if (args[0].endsWith(".xlsx"))
+            {
+               providedFile[0] = args[0]; // if the first argument ends with .xlsx, it is the excel file.
+               numberRange = args[1];
+            }
+            else
+            {
+               if (!args[1].endsWith(".xlsx"))
+                  throw new IOException("You provided 2 arguments, but one of them was not an excel file. If you're just trying to include a sheet range, please check to make sure there are no numbers between your comma-separated values.");
+               providedFile[0] = args[1];
+               numberRange = args[0];
+            }
+         }
+         if (args.length == 1)
+         {
+            // check if the file ends in .xlsx, if not, it is the number range
+            if (args[0].endsWith(".xlsx"))
+               providedFile[0] = args[0];
+            else
+               numberRange = args[0];
+         }
+         System.out.println(numberRange);
+         // need to implement logic to find which one would be the file. First argument could be excel file.
+         /*
+             Four possibilities:
+             1. File with sheet range
+             2. File without sheet range
+             3. Range without file 
+             4. No arguments provided (should be relatively easy)
+             Right now, we're going to assume if one of the arguments does not in .xlsx, then it is the sheet range.
+          */
+         File inputPath = FindInputFile(providedFile);
          if(inputPath.length() == 0 ){ // If the file returned is empty.
             System.out.println("This file seems to be empty.\nPlease check " + inputPath + ".");
          }
          else{ // If the file returned is not empty.
 
             int startingSheet;
-            Scanner scanner = new Scanner(System.in);
 
             System.out.println("\nWhich sheets would you like to run the program on? ");
             System.out.println("Type \'*\' for all sheets, use - between numbers for a range, or type in each individual number separated by commas.");
             System.out.println("Example: \'4-*\' means run the program from the fourth sheet to the last sheet.");
-            System.out.println("Example: \'2, 3, 4, 10, 12\' runs the programs on the specified sheets.");
+            System.out.println("Example: \'2,3,4,10,12\' runs the programs on the specified sheets. (Please do not include spaces between the commas.)");
 
             File outputPath = CreateOutput(inputPath);
             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
             int number_of_sheets = wb.getNumberOfSheets();
 
-            System.out.println("what is happening");
-            
-
-            String sheetInput = scanner.nextLine();
-            scanner.close();
-
-            String[] sheetNumbers = sheetInput.split("[, ]");
+            String[] sheetNumbers = numberRange.split("[,]");
+            for (int i = 0; i < sheetNumbers.length; i++)
+            {
+               sheetNumbers[i] = sheetNumbers[i].trim();  // gets rid of the white space if the user puts spaces in between their comma separated values.
+            }
             ArrayList<Integer> sheetNumbers2 = new ArrayList<Integer>(); // will come up with a better name for this soon
 
             /*
@@ -71,24 +110,27 @@ public class AbstractDoiFinder {
             {
                if (sheetNumbers[i].equals("*"))
                {
-                  startingSheet = 2;
+                  sheetNumbers2.add(2); // starting index of our sheet now.
                   break;
                }
                if (sheetNumbers[i].contains("-"))
                {
+                  System.out.println(sheetNumbers[i]);
                   String[] rangeNumbers = sheetNumbers[i].split("-"); //should only have two numbers, the first in the range and the last "number"
                   if (rangeNumbers[0].equals("*"))
                      throw new Exception("You cannot include * as the first argument in a range. Please try again with different sheet selections.");
                   
                   if (rangeNumbers[1].equals("*"))
                   {
-                     for (int j = Integer.parseInt(rangeNumbers[0]); j < number_of_sheets; j++)
+                     if (Integer.parseInt(rangeNumbers[0]) > number_of_sheets)
+                        throw new Exception("The numbers provided in the range exceed the number of sheets in the specified excel file.");
+                     for (int j = Integer.parseInt(rangeNumbers[0]); j <= number_of_sheets; j++)
                         sheetNumbers2.add(j);
                      continue;
                   }
                   else
                   {
-                     for (int j = Integer.parseInt(rangeNumbers[0]); j < Integer.parseInt(rangeNumbers[1]); j++)
+                     for (int j = Integer.parseInt(rangeNumbers[0]); j <= Integer.parseInt(rangeNumbers[1]); j++)
                         sheetNumbers2.add(j);
                      continue;
                   }
