@@ -67,7 +67,6 @@ public class AbstractDoiFinder {
             else
                numberRange = args[0];
          }
-         System.out.println(numberRange);
          // need to implement logic to find which one would be the file. First argument could be excel file.
          /*
              Four possibilities:
@@ -84,11 +83,6 @@ public class AbstractDoiFinder {
          else{ // If the file returned is not empty.
 
             int startingSheet;
-
-            System.out.println("\nWhich sheets would you like to run the program on? ");
-            System.out.println("Type \'*\' for all sheets, use - between numbers for a range, or type in each individual number separated by commas.");
-            System.out.println("Example: \'4-*\' means run the program from the fourth sheet to the last sheet.");
-            System.out.println("Example: \'2,3,4,10,12\' runs the programs on the specified sheets. (Please do not include spaces between the commas.)");
 
             File outputPath = CreateOutput(inputPath);
             XSSFWorkbook wb = new XSSFWorkbook(outputPath);
@@ -110,7 +104,7 @@ public class AbstractDoiFinder {
             {
                if (sheetNumbers[i].equals("*"))
                {
-                  sheetNumbers2.add(2); // starting index of our sheet now.
+                  sheetNumbers2.add(0); // starting index of our sheet now.
                   break;
                }
                if (sheetNumbers[i].contains("-"))
@@ -140,8 +134,6 @@ public class AbstractDoiFinder {
 
             wb.close();
 
-            for (int i = 0; i < sheetNumbers2.size(); i++)
-               System.out.println(sheetNumbers2.get(i));
             startingSheet = sheetNumbers2.get(0);
 
             //int startingSheet = 2; // This is bad practise: I am assuming that the sheets starting with the 3 (included) needs to gets filled with doi / abstracts.
@@ -167,7 +159,9 @@ public class AbstractDoiFinder {
                Need to fix the program to include the new logic for when specific sheets are treated. 
                It does not crash, but it would not run on the sheets provided right now. 
              */
-            for (int sheetIndex=startingSheet; sheetIndex < number_of_sheets; sheetIndex++){
+            for (int sheetIndex=sheetNumbers2.get(0); sheetIndex < number_of_sheets && sheetIndex < sheetNumbers2.get(sheetNumbers2.size() - 1); sheetIndex++){
+               if (!sheetNumbers2.contains(sheetIndex))
+                  continue;
                ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
                ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
                Write_To_Excel(contentList, sheetIndex, outputPath); // Currently only does one sheet at a time and needs to be manually update
@@ -210,7 +204,7 @@ public class AbstractDoiFinder {
          throw new IOException("Sorry, there is no input/ folder, there is nothing I can do.\nPlease, create an input/ folder and place your spreadsheet in it.");
       }
       else{ // The input/ folder exists
-         if (args.length == 0) { // Did the user gave an argument?
+         if (args[0] == null || args.length == 0) { // Did the user gave an argument?
             System.out.println("You did not provide a file to process, I will look in the input/ folder for a spreadsheet.");
             File[] filesInInputFolder = inputFolder.listFiles(xlsxFilter); // We filter the list of files in input/, looking for files that ends with xlsx.
             if (filesInInputFolder.length > 1){
@@ -281,9 +275,9 @@ public class AbstractDoiFinder {
    }
 
    public static XSSFWorkbook ShiftColumns(XSSFWorkbook wb) throws Exception {
-      int startingSheet = 2; // This is bad practise: We're assuming that the sheets starting with the 2 (included) needs to be shifted
+      int startingSheet = 0; // This is bad practise: We're assuming that the sheets starting with the 2 (included) needs to be shifted
       int abstractColumn = 0, doiColumn = 0; // Initializing the values for the columns, it throws an error otherwise. (title should be part of the general format, although it will most likely be there anyway)
-      boolean hasAbstractColumn = false, hasDOIColumn = false; // If the sheet has a column, we do not want to add another one of the same type
+      boolean hasAbstractColumn = false, hasDOIColumn = false, hasTitle = false; // If the sheet has a column, we do not want to add another one of the same type
 
       /* 
         Loops through every sheet of the workbook to see if an abstract or doi column already exists.
@@ -295,6 +289,7 @@ public class AbstractDoiFinder {
       */
       for (int sn = startingSheet; sn < wb.getNumberOfSheets(); sn++)
       {
+         hasTitle = false;
          hasAbstractColumn = false;
          hasDOIColumn = false; // resets the boolean values back to false before switching to the next sheet
          Sheet sheet = wb.getSheetAt(sn);
@@ -314,7 +309,6 @@ public class AbstractDoiFinder {
                {
                   abstractColumn = i + 1;
                   doiColumn = i + 2; // updates the values of where the columns should be since we are putting it after the title.
-                  System.out.println("Abstract and DOI column location has been updated...");
                }
                if (cellValue.toLowerCase().equals("abstract") || cellValue.toLowerCase().equals("abstracts"))
                   hasAbstractColumn = true;
@@ -328,12 +322,14 @@ public class AbstractDoiFinder {
             sheet.shiftColumns(abstractColumn, noOfColumns, 1);
             sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
             sheet.getRow(0).getCell(abstractColumn).setCellValue("Abstract"); // Then we add the desired attribute name to the cell
+            System.out.println("An abstract column has been inserted for each sheet with a title column with no abstract column already existing.");
          }
          if (Boolean.FALSE.equals(hasDOIColumn))
          {
             sheet.shiftColumns(doiColumn, noOfColumns, 1);
             sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
             sheet.getRow(0).getCell(doiColumn).setCellValue("DOI"); // Then we add the desired attribute name to the cell
+            System.out.println("A DOI column has been inserted for each sheet with a title column with no DOI column already existing.");
          }
          
       }
