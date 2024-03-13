@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Objects;
 
 import java.net.UnknownHostException;
 import java.net.MalformedURLException;
@@ -304,9 +305,12 @@ public class AbstractDoiFinder {
          hasDOIColumn = false; // resets the boolean values back to false before switching to the next sheet
          Sheet sheet = wb.getSheetAt(sn);
          int noOfColumns;
-         if (sheet == null) // if the sheet is null, further lines will crash the program.
+         if (sheet == null || 
+            Objects.isNull(sheet.getRow(0))) // if the sheet is null, further lines will crash the program.
             continue;
-         if (sheet.getRow(0).getPhysicalNumberOfCells() == null)
+         if (Objects.isNull(sheet.getRow(0).getPhysicalNumberOfCells()))
+            continue;
+         if (sheet.getRow(0).getPhysicalNumberOfCells() == 0)
             continue;   
          else
             noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells(); // This is bad practise: We're am assuming that each row has the same number of columns as the first one.
@@ -613,7 +617,7 @@ public class AbstractDoiFinder {
                {
                   String valueOfCell = cell.getStringCellValue();
                   
-                  if (valueOfCell.toLowerCase().equals("abstract"))
+                  if (valueOfCell.toLowerCase().equals("abstract") || valueOfCell.toLowerCase().equals("abstracts"))
                   {
                      for (int j = 1; j <= rows; j++)
                      {
