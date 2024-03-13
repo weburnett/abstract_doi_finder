@@ -104,7 +104,10 @@ public class AbstractDoiFinder {
             {
                if (sheetNumbers[i].equals("*"))
                {
-                  sheetNumbers2.add(0); // starting index of our sheet now.
+                  for (int j = 0; j < number_of_sheets; j++){
+                     sheetNumbers2.add(j);
+                     System.out.println(j);
+                  }
                   break;
                }
                if (sheetNumbers[i].contains("-"))
@@ -159,7 +162,7 @@ public class AbstractDoiFinder {
                Need to fix the program to include the new logic for when specific sheets are treated. 
                It does not crash, but it would not run on the sheets provided right now. 
              */
-            for (int sheetIndex=sheetNumbers2.get(0); sheetIndex < number_of_sheets && sheetIndex < sheetNumbers2.get(sheetNumbers2.size() - 1); sheetIndex++){
+            for (int sheetIndex=sheetNumbers2.get(0); sheetIndex < number_of_sheets; sheetIndex++){
                if (!sheetNumbers2.contains(sheetIndex))
                   continue;
                ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
@@ -307,6 +310,7 @@ public class AbstractDoiFinder {
                String cellValue = cell.getStringCellValue();
                if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
                {
+                  hasTitle = true;
                   abstractColumn = i + 1;
                   doiColumn = i + 2; // updates the values of where the columns should be since we are putting it after the title.
                }
@@ -316,22 +320,23 @@ public class AbstractDoiFinder {
                   hasDOIColumn = true;
             }
          }
-
-         if (Boolean.FALSE.equals(hasAbstractColumn))
+         if (Boolean.TRUE.equals(hasTitle))
          {
-            sheet.shiftColumns(abstractColumn, noOfColumns, 1);
-            sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
-            sheet.getRow(0).getCell(abstractColumn).setCellValue("Abstract"); // Then we add the desired attribute name to the cell
-            System.out.println("An abstract column has been inserted for each sheet with a title column with no abstract column already existing.");
-         }
-         if (Boolean.FALSE.equals(hasDOIColumn))
-         {
-            sheet.shiftColumns(doiColumn, noOfColumns, 1);
-            sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
-            sheet.getRow(0).getCell(doiColumn).setCellValue("DOI"); // Then we add the desired attribute name to the cell
-            System.out.println("A DOI column has been inserted for each sheet with a title column with no DOI column already existing.");
-         }
-         
+            if (Boolean.FALSE.equals(hasAbstractColumn))
+            {
+               sheet.shiftColumns(abstractColumn, noOfColumns, 1);
+               sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
+               sheet.getRow(0).getCell(abstractColumn).setCellValue("Abstract"); // Then we add the desired attribute name to the cell
+               System.out.println("An abstract column has been inserted for each sheet with a title column with no abstract column already existing.");
+            }
+            if (Boolean.FALSE.equals(hasDOIColumn))
+            {
+               sheet.shiftColumns(doiColumn, noOfColumns, 1);
+               sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
+               sheet.getRow(0).getCell(doiColumn).setCellValue("DOI"); // Then we add the desired attribute name to the cell
+               System.out.println("A DOI column has been inserted for each sheet with a title column with no DOI column already existing.");
+            }
+         }  
       }
       return wb;
    }
@@ -343,7 +348,7 @@ public class AbstractDoiFinder {
    // one idea --> have a boolean variable for each to see how far it made it into the program
    public static ArrayList<ArrayList<String>> RetrieveData(ArrayList<String> searchFor)
    {
-      
+
       String abstracttext = " "; // Will be overwritten by the abstract if we succeed.
       
       String doiText = " "; // Will be overwritten by the DOI if we succeed
@@ -355,6 +360,12 @@ public class AbstractDoiFinder {
       ArrayList<String> doiList = new ArrayList<String>(); // creates a list to store the doi in
       
       ArrayList<ArrayList<String>> returnedList = new ArrayList<ArrayList<String>>();
+
+      if (searchFor == null)
+      {
+         returnedList = null;
+         return returnedList;
+      }
       
       boolean hasAbstract = false, hasDOI = false; //declares and initializes them
       
@@ -492,39 +503,62 @@ public class AbstractDoiFinder {
       
       XSSFRow row = sheet.getRow(0); // starting the row at 0 for current sheet.
       
+      boolean hasTitle = false;
       for (int i = 0; i < cols; i++)
       {
          XSSFCell cell = row.getCell(i);
+         if (cell == null)
+            continue;
+         if (cell.getCellType() == CellType.STRING)
+         {
+            String cellValue = cell.getStringCellValue();
+            if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
+               hasTitle = true;
+         }
+      }
+
+      if (hasTitle) // if the sheet has a title column
+      {
+         for (int i = 0; i < cols; i++)
+         {
+            XSSFCell cell = row.getCell(i);
          
-         // tests if the cell is null, since testing the cell type would throw an error if null (<= this is not the case, we are not throwing an error. Why?)
-         // This is only intended for the titles of each column in our target excel file, since we will not need data from any other column
-         
-         if (cell == null) 
-            continue; // Well, we don't actually throw an error. Why not?
-            if (cell.getCellType() == CellType.STRING)
-            {
-               String cellValue = cell.getStringCellValue(); // gets the value of the cell if it is a string value
-               if (cellValue.toLowerCase().equals("researcher")) //if the value of the cell is equal to "researcher", then we get the name of that researcher
+            // tests if the cell is null, since testing the cell type would throw an error if null (<= this is not the case, we are not throwing an error. Why?)
+            // This is only intended for the titles of each column in our target excel file, since we will not need data from any other column
+
+            if (cell == null)
+               continue; // Well, we don't actually throw an error. Why not?
+               if (cell.getCellType() == CellType.STRING)
                {
-                  XSSFRow tempRow = sheet.getRow(1);
-                  XSSFCell tempCell = tempRow.getCell(i); //creating temp objects so we do not accidentally shift the row and cells, since we still need the titles
-                  cellValue = tempCell.getStringCellValue();
-                  searchList.add(cellValue);
-               }
-               if (cellValue.toLowerCase().equals("title"))
-               {
-                  for (int j = 1; j <= rows; j++)
+                  String cellValue = cell.getStringCellValue(); // gets the value of the cell if it is a string value
+                  if (cellValue.toLowerCase().equals("researcher") || cellValue.toLowerCase().equals("researchers") || cellValue.toLowerCase().equals("author") || cellValue.toLowerCase().equals("authors")) //if the value of the cell is equal to "researcher", then we get the name of that researcher
                   {
-                     row = sheet.getRow(j);
-                     cell = row.getCell(i);
-                     if (cell == null)
-                        break;
-                     cellValue = cell.getStringCellValue(); // loops through each cell in the specified "title" column until we have all the titles in our list
+                     XSSFRow tempRow = sheet.getRow(1);
+                     XSSFCell tempCell = tempRow.getCell(i); //creating temp objects so we do not accidentally shift the row and cells, since we still need the titles
+                     cellValue = tempCell.getStringCellValue();
                      searchList.add(cellValue);
                   }
+                  if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
+                  {
+                     for (int j = 1; j <= rows; j++)
+                     {
+                        row = sheet.getRow(j);
+                        cell = row.getCell(i);
+                        if (cell == null)
+                           break;
+                        cellValue = cell.getStringCellValue(); // loops through each cell in the specified "title" column until we have all the titles in our list
+                        searchList.add(cellValue);
+                     }
+                  }
                }
-            }
+         }
       }
+      else
+      { 
+         System.out.println(sheet.getSheetName() + " was skipped due to not having a title column.");
+         searchList = null;
+      }
+
       fins.close(); //closes the inputstream
       wb.close();
       // the author's name will always be the first index followed by the titles
@@ -533,6 +567,10 @@ public class AbstractDoiFinder {
    
    public static void Write_To_Excel(ArrayList<ArrayList<String>> writeList, int sheetIndex, File outputPath) throws Exception {
       try {
+
+         if (writeList == null)
+            return;
+
          ArrayList<String> abstractList = writeList.get(0);
          ArrayList<String> doiList = writeList.get(1); 
          FileInputStream fins = new FileInputStream(outputPath);
