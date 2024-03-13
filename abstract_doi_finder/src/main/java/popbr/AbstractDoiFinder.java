@@ -106,13 +106,11 @@ public class AbstractDoiFinder {
                {
                   for (int j = 0; j < number_of_sheets; j++){
                      sheetNumbers2.add(j);
-                     System.out.println(j);
                   }
                   break;
                }
                if (sheetNumbers[i].contains("-"))
                {
-                  System.out.println(sheetNumbers[i]);
                   String[] rangeNumbers = sheetNumbers[i].split("-"); //should only have two numbers, the first in the range and the last "number"
                   if (rangeNumbers[0].equals("*"))
                      throw new Exception("You cannot include * as the first argument in a range. Please try again with different sheet selections.");
@@ -128,9 +126,18 @@ public class AbstractDoiFinder {
                   else
                   {
                      for (int j = Integer.parseInt(rangeNumbers[0]); j <= Integer.parseInt(rangeNumbers[1]); j++)
+                     {
+                        if (j > number_of_sheets)
+                           break;
                         sheetNumbers2.add(j);
+                     }
                      continue;
                   }
+               }
+               if (Integer.parseInt(sheetNumbers[i]) > number_of_sheets)
+               {
+                  System.out.print(sheetNumbers[i] + " exceeds the range of the number of sheets so the program will only run on the valid sheets specified before this number.");
+                  break;
                }
                sheetNumbers2.add(Integer.parseInt(sheetNumbers[i]));
             }
@@ -278,7 +285,7 @@ public class AbstractDoiFinder {
    }
 
    public static XSSFWorkbook ShiftColumns(XSSFWorkbook wb) throws Exception {
-      int startingSheet = 0; // This is bad practise: We're assuming that the sheets starting with the 2 (included) needs to be shifted
+      int startingSheet = 0; // This is bad practise: We're assuming that the sheets starting with the 0 (included) needs to be shifted
       int abstractColumn = 0, doiColumn = 0; // Initializing the values for the columns, it throws an error otherwise. (title should be part of the general format, although it will most likely be there anyway)
       boolean hasAbstractColumn = false, hasDOIColumn = false, hasTitle = false; // If the sheet has a column, we do not want to add another one of the same type
 
@@ -296,9 +303,13 @@ public class AbstractDoiFinder {
          hasAbstractColumn = false;
          hasDOIColumn = false; // resets the boolean values back to false before switching to the next sheet
          Sheet sheet = wb.getSheetAt(sn);
+         int noOfColumns;
          if (sheet == null) // if the sheet is null, further lines will crash the program.
             continue;
-         int noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells(); // This is bad practise: We're am assuming that each row has the same number of columns as the first one.
+         if (sheet.getRow(0).getPhysicalNumberOfCells() == null)
+            continue;   
+         else
+            noOfColumns = sheet.getRow(0).getPhysicalNumberOfCells(); // This is bad practise: We're am assuming that each row has the same number of columns as the first one.
 
          for (int i = 0; i < noOfColumns; i++)
          {
