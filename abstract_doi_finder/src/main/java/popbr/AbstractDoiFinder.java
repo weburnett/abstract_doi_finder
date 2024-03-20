@@ -628,7 +628,7 @@ public class AbstractDoiFinder {
                      }
                      row = sheet.getRow(0); //sets the row back to 0 after running
                   }
-                  if (valueOfCell.toUpperCase().equals("DOI"))
+                  if (valueOfCell.toUpperCase().equals("DOI") || valueOfCell.toUpperCase().equals("DOIS"))
                   {
                      for (int l = 1; l <= doiRows; l++)
                      {

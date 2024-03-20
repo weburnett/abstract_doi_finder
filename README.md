@@ -18,7 +18,7 @@ where '1,2,3' is the range/sheets you want to run the program on. Please separat
 
 The range can be provided in a multitude of ways including:
 
-- * can be used to run the program on all sheets. This is also the default if no sheet range is provided.
+- "*" can be used to run the program on all sheets. This is also the default if no sheet range is provided.
 - "1,2,3" would run the program on sheets 1, 2, and 3 in the excel file provided/found.
 - "4-10" would run the program on sheets 4, 5, 6, 7, 8, 9, and 10 on the excel file provided/found.
 - "10-*" would run the program from sheet 10 to the end of the excel file provided/found.
