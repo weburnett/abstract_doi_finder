@@ -263,6 +263,9 @@ public class AbstractDoiFinder {
       if (outputPath.exists()){
          throw new IOException("It seems that the file\n\t" + outputPath + "\nalready exists. Please rename it so that it doesn't get overridden.");
       }
+      else{
+         System.out.println("Output file will stored in\n\t" + outputPath + ".");
+      }
    
       FileOutputStream outputFile = new FileOutputStream(outputPath); // FileOutputStream needed for write operation later on.
       FileUtils.copyFile(inputPath, outputPath); // We make a simple "file" copy of the input sheet in the target path.
