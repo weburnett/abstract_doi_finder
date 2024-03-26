@@ -322,7 +322,7 @@ public class AbstractDoiFinder {
                continue;
             if (cell.getCellType() == CellType.STRING)
             {
-               String cellValue = cell.getStringCellValue();
+               String cellValue = cell.getStringCellValue().trim();
                if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
                {
                   hasTitle = true;
@@ -526,7 +526,7 @@ public class AbstractDoiFinder {
             continue;
          if (cell.getCellType() == CellType.STRING)
          {
-            String cellValue = cell.getStringCellValue();
+            String cellValue = cell.getStringCellValue().trim();
             if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
                hasTitle = true;
          }
@@ -545,12 +545,12 @@ public class AbstractDoiFinder {
                continue; // Well, we don't actually throw an error. Why not?
                if (cell.getCellType() == CellType.STRING)
                {
-                  String cellValue = cell.getStringCellValue(); // gets the value of the cell if it is a string value
+                  String cellValue = cell.getStringCellValue().trim(); // gets the value of the cell if it is a string value
                   if (cellValue.toLowerCase().equals("researcher") || cellValue.toLowerCase().equals("researchers") || cellValue.toLowerCase().equals("author") || cellValue.toLowerCase().equals("authors")) //if the value of the cell is equal to "researcher", then we get the name of that researcher
                   {
                      XSSFRow tempRow = sheet.getRow(1);
                      XSSFCell tempCell = tempRow.getCell(i); //creating temp objects so we do not accidentally shift the row and cells, since we still need the titles
-                     cellValue = tempCell.getStringCellValue();
+                     cellValue = tempCell.getStringCellValue().trim();
                      searchList.add(cellValue);
                   }
                   if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
@@ -561,7 +561,7 @@ public class AbstractDoiFinder {
                         cell = row.getCell(i);
                         if (cell == null)
                            break;
-                        cellValue = cell.getStringCellValue(); // loops through each cell in the specified "title" column until we have all the titles in our list
+                        cellValue = cell.getStringCellValue().trim(); // loops through each cell in the specified "title" column until we have all the titles in our list
                         searchList.add(cellValue);
                      }
                   }
@@ -615,7 +615,7 @@ public class AbstractDoiFinder {
                continue; // Well, we don't actually throw an error. Why not?
                if (cell.getCellType() == CellType.STRING)
                {
-                  String valueOfCell = cell.getStringCellValue();
+                  String valueOfCell = cell.getStringCellValue().trim();
                   
                   if (valueOfCell.toLowerCase().equals("abstract") || valueOfCell.toLowerCase().equals("abstracts"))
                   {
