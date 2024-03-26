@@ -7,11 +7,7 @@ on:
     paths:
     - 'abstract_doi_finder/input/**.xlsx'
   workflow_dispatch: 
-   inputs:
-       environment:
-         type: string
-         default: DEV
-         required: true
+
 
 jobs:
   build:
