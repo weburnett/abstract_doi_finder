@@ -26,7 +26,7 @@ jobs:
           mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder"
       # This should save an excel sheet to the specified path with the artifact being a zipped folder called Installation_Test-artifact.zip.
       - name: Save artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: Remote_execution
-            path: output
+            path: output/
