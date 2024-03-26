@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: Remote_execution
-            path: output/
+            path: /home/runner/work/abstract_doi_finder/abstract_doi_finder/abstract_doi_finder/output/
