@@ -340,20 +340,37 @@ public class AbstractDoiFinder {
          }
          if (Boolean.TRUE.equals(hasTitle))
          {
-            if (Boolean.FALSE.equals(hasAbstractColumn))
+            if (Boolean.FALSE.equals(hasAbstractColumn) && sheet.getRow(0).getCell(abstractColumn) != null && sheet.getRow(0).getCell(abstractColumn).getCellType() != CellType.BLANK)
             {
                sheet.shiftColumns(abstractColumn, noOfColumns, 1);
                sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
                sheet.getRow(0).getCell(abstractColumn).setCellValue("Abstract"); // Then we add the desired attribute name to the cell
-               System.out.println("An abstract column has been inserted for each sheet with a title column with no abstract column already existing.");
+               System.out.println("An abstract column has been inserted for the sheet " + sheet.getSheetName() + " since it had a title column.");
             }
-            if (Boolean.FALSE.equals(hasDOIColumn))
+            else if (Boolean.FALSE.equals(hasAbstractColumn)) // if the cell is empty or "blank", then it would just create an abstract column instead.
             {
+               sheet.getRow(0).createCell(abstractColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle());
+               sheet.getRow(0).getCell(abstractColumn).setCellValue("Abstract");
+               System.out.println("An abstract column has been inserted for the sheet " + sheet.getSheetName() + " since it had a title column.");
+            }
+            else
+               System.out.println("An abstract column already existed for the " + sheet.getSheetName() + " sheet."); 
+            if (Boolean.FALSE.equals(hasDOIColumn) && sheet.getRow(0).getCell(doiColumn) != null && sheet.getRow(0).getCell(doiColumn).getCellType() != CellType.BLANK)
+            {
+               // if a cell already exists for the DOI column slot, we shift over.
                sheet.shiftColumns(doiColumn, noOfColumns, 1);
                sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle()); // creates the cell with the specified cell style
                sheet.getRow(0).getCell(doiColumn).setCellValue("DOI"); // Then we add the desired attribute name to the cell
-               System.out.println("A DOI column has been inserted for each sheet with a title column with no DOI column already existing.");
+               System.out.println("A DOI column has been inserted for the sheet " + sheet.getSheetName() + " since it had a title column.");
             }
+            else if (Boolean.FALSE.equals(hasDOIColumn)) // if the cell is empty, but has a title without the DOI, we insert it in the blank spot.
+            {
+               sheet.getRow(0).createCell(doiColumn, CellType.STRING).setCellStyle(sheet.getRow(0).getCell(0).getCellStyle());
+               sheet.getRow(0).getCell(doiColumn).setCellValue("DOI");
+               System.out.println("A DOI column has been inserted for the sheet " + sheet.getSheetName() + " since it had a title column.");
+            }
+            else
+               System.out.println("A DOI column already existed for the " + sheet.getSheetName() + " sheet.");
          }  
       }
       return wb;
