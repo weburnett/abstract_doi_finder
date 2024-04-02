@@ -6,7 +6,7 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
 
 - First, we need some set-up:
     - [Prepare a spreadsheet](#sheet-requirements),
-    - If you don't have an account on [github](https://github.com/), [create one](https://github.com/signup),
+    - If you don't have an account on [github](https://github.com/), [create one](https://github.com/signup) and make sure you are logged-in.
 
 - We will now create a copy of the program:
     - Go to <https://github.com/popbr/abstract_doi_finder/fork>, to "fork" (that is, create a copy of) our repository (that is, the program code),
