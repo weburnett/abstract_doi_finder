@@ -568,22 +568,34 @@ public class AbstractDoiFinder {
                   String cellValue = cell.getStringCellValue().trim(); // gets the value of the cell if it is a string value
                   if (cellValue.toLowerCase().equals("researcher") || cellValue.toLowerCase().equals("researchers") || cellValue.toLowerCase().equals("author") || cellValue.toLowerCase().equals("authors")) //if the value of the cell is equal to "researcher", then we get the name of that researcher
                   {
+                     // Solved the issue:
+                     // The row was not set back to the original "search" row, causing the researcher column to be missed.
+                     // Adding that line in other sections where we use this block of code.
+
                      XSSFRow tempRow = sheet.getRow(1);
                      XSSFCell tempCell = tempRow.getCell(i); //creating temp objects so we do not accidentally shift the row and cells, since we still need the titles
                      cellValue = tempCell.getStringCellValue().trim();
-                     searchList.add(cellValue);
+                     searchList.add(0, cellValue);
                   }
                   if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
                   {
                      for (int j = 1; j <= rows; j++)
                      {
+                        /*
+                         * Jotting down an idea:
+                         * To keep track of the user data, if the cell is not empty or does not have "no abstract/doi" in a cell, we place "Already has Abstract/DOI" in searchList and we can skip that index.
+                         * Two solutions: 
+                         * 1. Skip those that have both
+                         * 2. Try to figure out how to search for one
+                         */
                         row = sheet.getRow(j);
                         cell = row.getCell(i);
                         if (cell == null)
-                           break;
+                           continue;
                         cellValue = cell.getStringCellValue().trim(); // loops through each cell in the specified "title" column until we have all the titles in our list
                         searchList.add(cellValue);
                      }
+                     row = sheet.getRow(0); // resetting the row back to the 'header' row.
                   }
                }
          }
