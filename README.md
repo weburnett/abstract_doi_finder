@@ -14,21 +14,43 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
         ![](how_to/fork_in_github.png)
     - You should now see your own fork: you can make sure by checking that the address bar is of the form `https://github.com/<your-username>/abstract_doi_finder`, where `<your-username>` is your username (`aubertc` in the example below). 
 
-- Now we will delete the spreadsheet loaded by default.
+- We will now upload our own spreadsheet.
     Click on the "abstract_doi_finder" folder:
     ![](how_to/naviguate_in_github_1.png)
-    then click on the "input" folder, and on the "test_input.xlsx" file. On the right of "Go to file", click on the three dots, then on "Delete file":
+    
+    then click on the "input" folder, and click on the "Upload files" button hidden under the "Add file" button:
+    ![](how_to/naviguate_in_github_2.png)
+
+    Upload your spreadsheet, and click on "Commit changes":
+    ![](how_to/naviguate_in_github_3.png)
+
+    
+- Now we will delete the spreadsheet loaded by default.
+
+    Go back in the "input" folder, and click on the "test_input.xlsx" file. On the right of the screen, click on the three dots, then on "Delete file":
     ![](how_to/naviguate_in_github_4.png)
+    
     Finally, click on "Commit changes…" twice:
     ![](how_to/naviguate_in_github_5.png)
 
-- We will now upload our own spreadsheet.
-    Make sure you are still in the "input" folder, and click on the "Upload files" button hidden under the "Add file" button:
-    ![](how_to/naviguate_in_github_2.png)
-    Upload your spreadsheet, and click on "Commit changes"
+- Now, we will execute the program on our spreadsheet and download the resulting spreadsheet.
+
+    Click on "action", and then on "I understand my workflows, go ahead and enable them":
+    ![](how_to/naviguate_in_github_6.png)
     
-- Now, we will execute the program on our spreadsheet.
-    Click on "action"
+    Then, click on "Remote Execution", then on "Run workflow" (twice):
+    ![](how_to/naviguate_in_github_7.png)
+    
+    Be patient, your workflow will be executed:
+    ![](how_to/naviguate_in_github_8.png)
+    
+    Once it is over, a green check will replace the orange will. Click on it:
+    ![](how_to/naviguate_in_github_9.png)
+
+    Then, scroll down and click on "Remote_execution" under "Artifacts":
+    ![](how_to/naviguate_in_github_10.png)
+    
+    That's it, your download of the resulting spreadsheet should begin!
 
 
 
