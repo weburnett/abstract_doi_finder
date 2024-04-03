@@ -44,7 +44,7 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
     Be patient, your workflow will be executed:  
     > ![](how_to/naviguate_in_github_8.png)
     
-    Once it is over, a green check will replace the orange will. Click on it:  
+    Once it is over, a green check will replace the orange wheel. Click on it:  
     > ![](how_to/naviguate_in_github_9.png)
 
     Then, scroll down and click on "Remote_execution" under "Artifacts":  
@@ -56,31 +56,30 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
 
 _To be written_
 
-## How-to Compile and Use
-
+## How-to Compile and Execute
 
 ### Pre-requisites
 
 - [Maven](https://maven.apache.org/install.html) (tested with Maven 3.9.6),
 - Java (tested with Java 17.0.9),
-- A [spreadsheet](#sheet-requirements),
+- A [spreadsheet](#sheet-requirements).
 
 ### Compiling and Running the Program
 
 ```
 cd abstract_doi_finder/
 mvn compile
-mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder" -Dexec.args="Publication_Abstracts_Only_Dataset_9-26-23.xlsx 1,3"
+mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder" -Dexec.args="input_file.xlsx 1,3"
 ```
 
 where 
 
-- `Publication_Abstracts_Only_Dataset_9-26-23.xlsx` is the name of the spreadsheet placed in the `abstract_doi_finder/input/` folder (this argument is optional if only one sheet is in the `input/` folder), and
-- `1,3` is the range/sheets you want to run the program on. Please separate the values with commas, exclude spaces, or follow the examples below.
+- `input_file.xlsx` is the name of the spreadsheet placed in the `abstract_doi_finder/input/` folder (this argument is optional if only one sheet is in the `input/` folder, mandatory otherwise), and
+- `1,3` are the sheets you want to run the program on. Please separate the values with commas, exclude spaces, or follow the examples below.
 
 The range can be provided (or omitted) in a multitude of ways including:
 
 - "*" can be used to run the program on all sheets. This is also the default if no sheet range is provided.
-- "1,3" would run the program on sheets 1, and 3 in the excel file provided/found.
-- "4-10" would run the program on sheets 4, 5, 6, 7, 8, 9, and 10 on the excel file provided/found.
-- "10-*" would run the program from sheet 10 to the end of the excel file provided/found.
+- "1,3" would run the program on sheets 1 and 3,
+- "4-10" would run the program on sheets 4, 5, 6, 7, 8, 9, and 10,
+- "10-*" would run the program from sheet 10 to the last sheet.
