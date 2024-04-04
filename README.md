@@ -52,9 +52,28 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
     
     That's it, your download of the resulting spreadsheet should begin!
 
+  
+> [!NOTE]
+> If you want to run execute the program on a different sheet, simply upload your updated spreadsheet and head over to the "Actions" tab: if you there is only one sheet in the `input/` folder and the workflows have already been enabled, then they will execute automatically when the file in `input/` is edited.
+
+
 ## Sheet Requirements
 
-_To be written_
+> [!CAUTION]
+> Be aware that executing our program [as indicated above](#how-to-use) (that is, on github servers) will make your spreadsheet publicly accessible while the program is being executed, and after if you don't [delete your fork](https://docs.github.com/en/repositories/creating-and-managing-repositories/deleting-a-repository).
+
+Your speardsheetsheet *must*
+- use the `xlsx` format and extension,
+- have at least one sheet containing
+    - one column called "Author" or "Researcher" containing the name(s) of the author(s) (with or without capitals, singular or plural),
+    - one column called "Title" containing the title of the paper (with or without capitals, singular or plural).
+
+Your sheet *can*
+- have multiple sheets (all of them will be treated, except if [an argument](#arguments) limit the sheets to consider),
+- have sheets that do not contain columns called "Author" or "Title" (they will be skipped),
+- contain columns called "DOI" and "Abstract" (with or without capitals, singular or plural) -- those columns will be created if they are missing,
+
+An example sheet that can be used as a template [is provided](https://github.com/popbr/abstract_doi_finder/blob/main/abstract_doi_finder/input/test_input.xlsx).
 
 ## How-to Compile and Execute
 
@@ -72,7 +91,7 @@ mvn compile
 mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder" -Dexec.args="input_file.xlsx 1,3"
 ```
 
-where 
+#### Arguments
 
 - `input_file.xlsx` is the name of the spreadsheet placed in the `abstract_doi_finder/input/` folder (this argument is optional if only one sheet is in the `input/` folder, mandatory otherwise), and
 - `1,3` are the sheets you want to run the program on. Please separate the values with commas, exclude spaces, or follow the examples below.
