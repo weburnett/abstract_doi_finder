@@ -10,6 +10,7 @@ The name of a file contains
 - a if there is an "Abstract" column and it is not populated,
 - D if there is a "Doi" column and it is populated,
 - d if there is a "Doi" column and it is not populated.
+- m if it is some other miscellaneous test.
 
 # Generating the spreadsheet
 
@@ -23,5 +24,4 @@ Installing gnumeric is needed to access this command-line tool.
 
 In archives/ are the "problematic" examples:
 
-- TR1.csv, TR1DA.csv and TR1da.csv are problematic because of https://github.com/popbr/abstract_doi_finder/issues/17
-- ZEmpty is problematic because of https://github.com/popbr/abstract_doi_finder/issues/13
+- m_empty.csv is problematic because of https://github.com/popbr/abstract_doi_finder/issues/13
