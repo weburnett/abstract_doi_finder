@@ -75,6 +75,15 @@ Your sheet *can*
 
 An example sheet that can be used as a template [is provided](https://github.com/popbr/abstract_doi_finder/blob/main/abstract_doi_finder/input/test_input.xlsx).
 
+## Important Notes:
+
+1. Please verify that there are not any empty sheets within your excel file, as this may cause unforeseen errors.
+2. When entering an asterisk ('*') for the sheet range, it starts with the very first sheet in your excel file. (At index 0)
+3. When entering your sheet range, it is important to take note that each number is subtracted by 1, so it runs on your intended files.
+    - For example: The user inputs '1,2,3' which would run on the first sheet, the second sheet, and the third.
+    - But the program will use the indices 0, 1, and 2 to run on the specified sheets.
+    - Therefore, it is important to not use 0, as this was done for user convencience.
+
 ## How-to Compile and Execute
 
 ### Pre-requisites

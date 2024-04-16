@@ -121,7 +121,7 @@ public class AbstractDoiFinder {
                      if (Integer.parseInt(rangeNumbers[0]) > number_of_sheets)
                         throw new Exception("The numbers provided in the range exceed the number of sheets in the specified excel file.");
                      for (int j = Integer.parseInt(rangeNumbers[0]); j <= number_of_sheets; j++)
-                        sheetNumbers2.add(j);
+                        sheetNumbers2.add(j - 1);
                      continue;
                   }
                   else
@@ -130,7 +130,7 @@ public class AbstractDoiFinder {
                      {
                         if (j > number_of_sheets)
                            break;
-                        sheetNumbers2.add(j);
+                        sheetNumbers2.add(j - 1);
                      }
                      continue;
                   }
@@ -140,7 +140,7 @@ public class AbstractDoiFinder {
                   System.out.print(sheetNumbers[i] + " exceeds the range of the number of sheets so the program will only run on the valid sheets specified before this number.");
                   break;
                }
-               sheetNumbers2.add(Integer.parseInt(sheetNumbers[i]));
+               sheetNumbers2.add(Integer.parseInt(sheetNumbers[i]) - 1);
             }
 
             wb.close();
