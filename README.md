@@ -83,6 +83,8 @@ An example sheet that can be used as a template [is provided](https://github.com
     - For example: The user inputs '1,2,3' which would run on the first sheet, the second sheet, and the third.
     - But the program will use the indices 0, 1, and 2 to run on the specified sheets.
     - Therefore, it is important to not use 0, as this was done for user convencience.
+4. The program attempts to not override your data. If you have data in existing cells for both the abstract and DOI, it will not overwrite your data.
+    - However, if even one of them is missing, the program will search PubMed for the abstract and DOI, then overwrite the data.
 
 ## How-to Compile and Execute
 

@@ -422,6 +422,13 @@ public class AbstractDoiFinder {
                hasAbstract = false; //resets them for each loop in case they got set to true
                hasDOI = false;
                
+               if (searchFor.get(i).toLowerCase().equals("no need to search"))
+               {
+                  abstractList.add("skip when writing");
+                  doiList.add("skip when writing");
+                  continue;
+               } 
+
                searchString = searchFor.get(0) + " " + searchFor.get(i);
                
                /*
@@ -464,7 +471,7 @@ public class AbstractDoiFinder {
                 */
                if (Boolean.FALSE.equals(hasAbstract))
                {
-                  abstracttext = "no abstract on PubMed";
+                  abstracttext = "no abstract on pubmed";
                   abstractList.add(abstracttext);
                   try 
                   {
@@ -478,7 +485,7 @@ public class AbstractDoiFinder {
                }
                if (Boolean.FALSE.equals(hasDOI) && hasAbstract) // the abstractList will already have the abstract so you do not want to double add it to the list
                {
-                  doiText = "no doi on PubMed";
+                  doiText = "no doi on pubmed";
                   doiList.add(doiText);
                }
             }
@@ -496,9 +503,9 @@ public class AbstractDoiFinder {
       int count = 0, doiCount = 0;
       for (int k = 0; k < abstractList.size(); k++)
       {
-         if (abstractList.get(k).equals("no abstract on PubMed"))
+         if (abstractList.get(k).toLowerCase().equals("no abstract on pubmed"))
             count++;
-         if (doiList.get(k).equals("no doi on PubMed"))
+         if (doiList.get(k).toLowerCase().equals("no doi on pubmed"))
             doiCount++;
       }
       /* 
@@ -519,6 +526,10 @@ public class AbstractDoiFinder {
    public static ArrayList<String> Read_From_Excel(int sheetIndex, File inputPath) throws IOException, Exception{
       
       ArrayList<String> searchList = new ArrayList<String>();
+
+      int abstractIndex = 0, doiIndex = 0; // will keep track of the indices of the abstract and DOI columns, needs to be initializing or it throws an error with Maven.
+      // However, initializing it does not matter, since it will be overwritten, since every sheet with a title will have an abstract and DOI.
+      // and if a sheet does not have a title, it will be skipped over.
       
       FileInputStream fins = new FileInputStream(inputPath);
       
@@ -538,6 +549,11 @@ public class AbstractDoiFinder {
       
       XSSFRow row = sheet.getRow(0); // starting the row at 0 for current sheet.
       
+      /*
+       * Since we have to loop through the entire sheet anyway, we can use the local variables for our abstract and DOI columns
+       * if we have a title. If we don't, the sheet is skipped anyway.
+       * Therefore, this section is used to see if we have a title for a sheet and to find where the abstract and DOI are for later use.
+       */
       boolean hasTitle = false;
       for (int i = 0; i < cols; i++)
       {
@@ -549,6 +565,10 @@ public class AbstractDoiFinder {
             String cellValue = cell.getStringCellValue().trim();
             if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
                hasTitle = true;
+            if (cellValue.toLowerCase().equals("abstract") || cellValue.toLowerCase().equals("abstracts"))
+               abstractIndex = i;
+            if (cellValue.toUpperCase().equals("DOI") || cellValue.toUpperCase().equals("DOIS"))
+               doiIndex = i;
          }
       }
 
@@ -593,6 +613,20 @@ public class AbstractDoiFinder {
                         if (cell == null)
                            continue;
                         cellValue = cell.getStringCellValue().trim(); // loops through each cell in the specified "title" column until we have all the titles in our list
+                        /*
+                         * If the user provided data for both the DOI and Abstract, then it will skip and not overwrite their data.
+                         * However, if it only has one options, it will overwrite both of them when writing the data to the excel file.
+                         */
+
+                        /* I cannot understand why this is not working for some reason. It is saying it is true for some and not for others.
+                        if (Objects.isNull(row.getCell(abstractIndex)) || row.getCell(abstractIndex).getCellType() == CellType.BLANK)
+                           searchList.add("no need to search");
+                        else if (Objects.isNull(row.getCell(abstractIndex)) || row.getCell(doiIndex).getCellType() == CellType.BLANK)
+                           searchList.add("no need to search");
+                        else 
+                           searchList.add(cellValue);
+                        */
+                        
                         searchList.add(cellValue);
                      }
                      row = sheet.getRow(0); // resetting the row back to the 'header' row.
@@ -605,6 +639,10 @@ public class AbstractDoiFinder {
          System.out.println(sheet.getSheetName() + " was skipped due to not having a title column.");
          searchList = null;
       }
+
+      if (searchList != null)
+         for (int i = 0; i < searchList.size(); i++)
+            System.out.println(searchList.get(i));
 
       fins.close(); //closes the inputstream
       wb.close();
@@ -623,7 +661,7 @@ public class AbstractDoiFinder {
          FileInputStream fins = new FileInputStream(outputPath);
          XSSFWorkbook wb = new XSSFWorkbook(fins);
          if (wb.getNumberOfSheets() < sheetIndex){
-            System.out.println("Indiside Write_To_Excel, something is amiss. The sheet has" + wb.getNumberOfSheets() + "sheets, but I am looking for sheet #" + sheetIndex);
+            System.out.println("Inside Write_To_Excel, something is amiss. The sheet has" + wb.getNumberOfSheets() + "sheets, but I am looking for sheet #" + sheetIndex);
          }
          
          /*
@@ -655,6 +693,8 @@ public class AbstractDoiFinder {
                      {
                         int abIndex = j - 1; // allows us to access the correct abstract in our list
                         row = sheet.getRow(j); // sets us on the right row 
+                        if (abstractList.get(abIndex).toLowerCase().equals("skip when writing")) // keeps the data the user had in the cell
+                           continue;
                         row.createCell(i, CellType.STRING).setCellValue(abstractList.get(abIndex));
                         // we then "create" a cell which has a cell type of String, which allows us to write our abstract to the cell.
                      }
@@ -666,6 +706,8 @@ public class AbstractDoiFinder {
                      {
                         int doiIndex = l - 1; // allows us to access the correct abstract for each row, since row would be 1 more than the actual index
                         row = sheet.getRow(l); // sets us on the correct row
+                        if (doiList.get(doiIndex).toLowerCase().equals("skip when writing")) // keeps the data the user had in the cell
+                           continue;
                         row.createCell(i, CellType.STRING).setCellValue(doiList.get(doiIndex));
                      }
                      row = sheet.getRow(0); //sets the row back to 0 after running
