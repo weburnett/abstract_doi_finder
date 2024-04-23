@@ -121,13 +121,19 @@ public class AbstractDoiFinder {
                      if (Integer.parseInt(rangeNumbers[0]) > number_of_sheets)
                         throw new Exception("The numbers provided in the range exceed the number of sheets in the specified excel file.");
                      for (int j = Integer.parseInt(rangeNumbers[0]); j <= number_of_sheets; j++)
+                     {
+                        if (j <= 0)
+                           continue; //if j is less than 0, it would break the program later on due to subtracting 1 when adding to the range.
                         sheetNumbers2.add(j - 1);
+                     }
                      continue;
                   }
                   else
                   {
                      for (int j = Integer.parseInt(rangeNumbers[0]); j <= Integer.parseInt(rangeNumbers[1]); j++)
                      {
+                        if (j <= 0)
+                           continue; // this would break the program if j is less than 0. So we continue if j is less than 0, so the rest of the program runs smoothly.
                         if (j > number_of_sheets)
                            break;
                         sheetNumbers2.add(j - 1);
