@@ -179,7 +179,12 @@ public class AbstractDoiFinder {
             for (int sheetIndex=sheetNumbers2.get(0); sheetIndex < number_of_sheets; sheetIndex++){
                if (!sheetNumbers2.contains(sheetIndex))
                   continue;
-               ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath); // Returns a searchList that has the author's name and all of the titles for our search query
+               /*
+                * ArrayList<String> searchList = Read_From_Excel(sheetIndex, inputPath);
+                * This is the original statement, I am changing the inputPath param to outputPath
+                * Since the path will definitely exist (considering we create it), there should not be any issues and should fix our override issue.
+                */
+               ArrayList<String> searchList = Read_From_Excel(sheetIndex, outputPath); // Returns a searchList that has the author's name and all of the titles for our search query
                ArrayList<ArrayList<String>> contentList = RetrieveData(searchList); // Takes a few minutes to accomplish due to having to search on the Internet
                Write_To_Excel(contentList, sheetIndex, outputPath); // Currently only does one sheet at a time and needs to be manually update
             }
@@ -572,7 +577,7 @@ public class AbstractDoiFinder {
             if (cellValue.toLowerCase().equals("title") || cellValue.toLowerCase().equals("titles"))
                hasTitle = true;
             if (cellValue.toLowerCase().equals("abstract") || cellValue.toLowerCase().equals("abstracts"))
-               abstractIndex = i;
+               abstractIndex = i; // not working for every sheet for some reason.
             if (cellValue.toUpperCase().equals("DOI") || cellValue.toUpperCase().equals("DOIS"))
                doiIndex = i;
          }
@@ -623,17 +628,13 @@ public class AbstractDoiFinder {
                          * If the user provided data for both the DOI and Abstract, then it will skip and not overwrite their data.
                          * However, if it only has one options, it will overwrite both of them when writing the data to the excel file.
                          */
-
-                        /* I cannot understand why this is not working for some reason. It is saying it is true for some and not for others.
-                        if (Objects.isNull(row.getCell(abstractIndex)) || row.getCell(abstractIndex).getCellType() == CellType.BLANK)
-                           searchList.add("no need to search");
-                        else if (Objects.isNull(row.getCell(abstractIndex)) || row.getCell(doiIndex).getCellType() == CellType.BLANK)
-                           searchList.add("no need to search");
-                        else 
+                        // I cannot understand why this is not working for some reason. It is saying it is true for some and not for others.
+                        if (Objects.isNull(row.getCell(abstractIndex)) || row.getCell(abstractIndex).getCellType() == CellType.BLANK || cellValue.toLowerCase().equals("no abstract on pubmed")) // if the object is not null, it adds "no need to search" to the list
                            searchList.add(cellValue);
-                        */
-                        
-                        searchList.add(cellValue);
+                        else if (Objects.isNull(row.getCell(doiIndex)) || row.getCell(abstractIndex).getCellType() == CellType.BLANK || cellValue.toLowerCase().equals("no doi on pubmed")) // when it is null, the thing is skipped????????????
+                           searchList.add(cellValue);
+                        else 
+                           searchList.add("no need to search");
                      }
                      row = sheet.getRow(0); // resetting the row back to the 'header' row.
                   }
@@ -645,10 +646,6 @@ public class AbstractDoiFinder {
          System.out.println(sheet.getSheetName() + " was skipped due to not having a title column.");
          searchList = null;
       }
-
-      if (searchList != null)
-         for (int i = 0; i < searchList.size(); i++)
-            System.out.println(searchList.get(i));
 
       fins.close(); //closes the inputstream
       wb.close();
