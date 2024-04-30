@@ -5,7 +5,7 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
 ## How-to Use
 
 - First, we need some set-up:
-    - [Prepare a spreadsheet](#spreadsheet-requirements),
+    - [Prepare a spreadsheet](#spreadsheet-requirements), 
     - If you don't have an account on [github](https://github.com/), [create one](https://github.com/signup) and make sure you are logged-in.
 
 - We will now create a copy of the program:
@@ -57,7 +57,7 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
 > If you want to run execute the program on a different sheet, simply upload your updated spreadsheet and head over to the "Actions" tab: if you there is only one sheet in the `input/` folder and the workflows have already been enabled, then they will execute automatically when the file in `input/` is edited.
 
 
-## Spreadsheet Requirements {#spreadsheet-requirements}
+## Spreadsheet Requirements
 
 > [!CAUTION]
 > Be aware that 
