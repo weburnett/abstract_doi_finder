@@ -5,7 +5,7 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
 ## How-to Use
 
 - First, we need some set-up:
-    - [Prepare a spreadsheet](#sheet-requirements),
+    - [Prepare a spreadsheet](#spreadsheet-requirements), 
     - If you don't have an account on [github](https://github.com/), [create one](https://github.com/signup) and make sure you are logged-in.
 
 - We will now create a copy of the program:
@@ -57,34 +57,32 @@ A simple tool to retrieve <abbr title="Digital Object Identifier">DOI</abbr>s an
 > If you want to run execute the program on a different sheet, simply upload your updated spreadsheet and head over to the "Actions" tab: if you there is only one sheet in the `input/` folder and the workflows have already been enabled, then they will execute automatically when the file in `input/` is edited.
 
 
-## Sheet Requirements
+## Spreadsheet Requirements
 
 > [!CAUTION]
-> Be aware that executing our program [as indicated above](#how-to-use) (that is, on github servers) will make your spreadsheet publicly accessible while the program is being executed, and after if you don't [delete your fork](https://docs.github.com/en/repositories/creating-and-managing-repositories/deleting-a-repository).
+> Be aware that 
+> 1. executing our program [as indicated above](#how-to-use) (that is, on github servers) will make your spreadsheet publicly accessible while the program is being executed, and after if you don't [delete your fork](https://docs.github.com/en/repositories/creating-and-managing-repositories/deleting-a-repository).
+> 2. even if our program is not supposed to edit your spreadsheet, always backing up your data before running this program is a good practise.
 
-Your speardsheetsheet *must*
+Your speardsheet *must*
 - use the `xlsx` format and extension,
 - have at least one sheet containing
     - one column called "Author" or "Researcher" containing the name(s) of the author(s) (with or without capitals, singular or plural),
     - one column called "Title" containing the title of the paper (with or without capitals, singular or plural).
 
-Your sheet *can*
+Your spreadsheet *can*
 - have multiple sheets (all of them will be treated, except if [an argument](#arguments) limit the sheets to consider),
 - have sheets that do not contain columns called "Author" or "Title" (they will be skipped),
 - contain columns called "DOI" and "Abstract" (with or without capitals, singular or plural) -- those columns will be created if they are missing,
 
+Your spreadsheet *must not*
+- contain empty sheets (this may cause unforeseen errors).
+
+> [!WARNING]  
+> The program will not override your data, but create a copy of the original sheet. Furthermore, if you have data in existing cells for both the abstract and DOI, the program will not overwrite your data. However, if even one of them is missing, the program will search PubMed for the abstract and DOI, then overwrite the data in its output spreadsheet.
+
 An example sheet that can be used as a template [is provided](https://github.com/popbr/abstract_doi_finder/blob/main/abstract_doi_finder/input/test_input.xlsx).
 
-## Important Notes:
-
-1. Please verify that there are not any empty sheets within your excel file, as this may cause unforeseen errors.
-2. When entering an asterisk ('*') for the sheet range, it starts with the very first sheet in your excel file. (At index 0)
-3. When entering your sheet range, it is important to take note that each number is subtracted by 1, so it runs on your intended files.
-    - For example: The user inputs '1,2,3' which would run on the first sheet, the second sheet, and the third.
-    - But the program will use the indices 0, 1, and 2 to run on the specified sheets.
-    - Therefore, it is important to not use 0, as this was done for user convencience.
-4. The program attempts to not override your data. If you have data in existing cells for both the abstract and DOI, it will not overwrite your data.
-    - However, if even one of them is missing, the program will search PubMed for the abstract and DOI, then overwrite the data.
 
 ## How-to Compile and Execute
 
@@ -104,6 +102,8 @@ mvn exec:java -Dexec.mainClass="popbr.AbstractDoiFinder" -Dexec.args="input_file
 
 #### Arguments
 
+In the command line above, 
+
 - `input_file.xlsx` is the name of the spreadsheet placed in the `abstract_doi_finder/input/` folder (this argument is optional if only one sheet is in the `input/` folder, mandatory otherwise), and
 - `1,3` are the sheets you want to run the program on. Please separate the values with commas, exclude spaces, or follow the examples below.
 
@@ -112,4 +112,12 @@ The range can be provided (or omitted) in a multitude of ways including:
 - "*" can be used to run the program on all sheets. This is also the default if no sheet range is provided.
 - "1,3" would run the program on sheets 1 and 3,
 - "4-10" would run the program on sheets 4, 5, 6, 7, 8, 9, and 10,
+- "*-3" would run the program on sheets 1, 2 and 3.
 - "10-*" would run the program from sheet 10 to the last sheet.
+- When entering an asterisk ('*') for the sheet range, it starts with the very first sheet in your excel file. (At index 0)
+
+> [!NOTE]  
+> When entering your sheet range, it is important to take note that each number is subtracted by 1, so it runs on your intended files.
+> For example: The user inputs '1,2,3' which would run on the first sheet, the second sheet, and the third.
+> But the program will use the indices 0, 1, and 2 to run on the specified sheets.
+>  Therefore, it is important to not use 0, as this was done for user convenience.
